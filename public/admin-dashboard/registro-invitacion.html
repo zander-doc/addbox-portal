@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro por Invitación — ADDBOX</title>
+  <link rel="stylesheet" href="./assets/css/inicio-de-sesion.css" />
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png" />
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <img src="/admin-dashboard/assets/img/logo-addbox.png" alt="ADDBOX Logo" class="auth-logo-img">
+        <p class="brand-sub">Registro por Invitación</p>
+      </div>
+
+      <h2>Crear tu cuenta</h2>
+      <p class="subtitle">Ingresa tu código de invitación y crea tu contraseña.</p>
+
+      <form id="registro-form">
+        <div class="input-group">
+          <input type="text" id="codigo-invitacion" placeholder="Código de invitación (INV-XXXXX)" required>
+        </div>
+        <div class="input-group">
+          <input type="email" id="reg-email" placeholder="Tu correo electrónico" required>
+        </div>
+        <div class="input-group password-group">
+          <input type="password" id="reg-password" placeholder="Crear contraseña (mín. 6 caracteres)" required>
+          <span class="toggle-password" data-target="reg-password">👁️</span>
+        </div>
+        <button type="submit" class="btn-primary">Crear cuenta</button>
+      </form>
+
+      <p id="reg-message" class="error"></p>
+
+      <div class="login-links">
+        <a href="/admin-dashboard/inicio-de-sesion.html" class="back-link">← Ya tengo cuenta</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script>
+    const SUPABASE_URL = "https://billwldqxupcavzurljo.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpbGx3bGRxeHVwY2F2enVybGpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNDAzODIsImV4cCI6MjA5MTgxNjM4Mn0.4jsINbwwL9RMjKMdnQu-nYM7qBLb9KIXhEsuXQrEGO8";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const msg = document.getElementById("reg-message");
+
+    document.getElementById("registro-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const codigo = document.getElementById("codigo-invitacion").value.trim();
+      const email = document.getElementById("reg-email").value.trim();
+      const password = document.getElementById("reg-password").value;
+
+      msg.textContent = "";
+      msg.style.color = "#8ab4ff";
+
+      if (!codigo || !email || !password) {
+        msg.textContent = "Todos los campos son obligatorios.";
+        msg.style.color = "#ff4d4d";
+        return;
+      }
+
+      if (password.length < 6) {
+        msg.textContent = "La contraseña debe tener al menos 6 caracteres.";
+        msg.style.color = "#ff4d4d";
+        return;
+      }
+
+      msg.textContent = "Verificando invitación...";
+
+      // 1. Verificar código de invitación
+      const { data: inv, error: invError } = await supabase
+        .from("invitaciones")
+        .select("*")
+        .eq("codigo", codigo)
+        .eq("estado", "pendiente")
+        .single();
+
+      if (invError || !inv) {
+        msg.textContent = "Código de invitación inválido o ya utilizado.";
+        msg.style.color = "#ff4d4d";
+        return;
+      }
+
+      // 2. Verificar que el email coincida
+      if (inv.email.toLowerCase() !== email.toLowerCase()) {
+        msg.textContent = "El correo no coincide con la invitación.";
+        msg.style.color = "#ff4d4d";
+        return;
+      }
+
+      msg.textContent = "Creando cuenta...";
+
+      // 3. Crear usuario en Supabase Auth
+      const { user, error: authError } = await supabase.auth.signUp({
+        email: email,
+        password: password
+      });
+
+      if (authError) {
+        msg.textContent = "Error: " + authError.message;
+        msg.style.color = "#ff4d4d";
+        return;
+      }
+
+      if (!user) {
+        msg.textContent = "Error al crear la cuenta. Intenta de nuevo.";
+        msg.style.color = "#ff4d4d";
+        return;
+      }
+
+      // 4. Actualizar tabla usuarios con el ID de Auth
+      await supabase.from("usuarios")
+        .update({ id: user.id, estado: "activo" })
+        .eq("email", email);
+
+      // 5. Marcar invitación como usada
+      await supabase.from("invitaciones")
+        .update({ estado: "usada", usado_por: user.id, usado_en: new Date().toISOString() })
+        .eq("id", inv.id);
+
+      msg.textContent = "✅ Cuenta creada. Redirigiendo al login...";
+      msg.style.color = "#28a745";
+
+      setTimeout(() => {
+        window.location.href = "/admin-dashboard/inicio-de-sesion.html";
+      }, 2000);
+    });
+
+    // Toggle password
+    document.querySelector(".toggle-password").addEventListener("click", function() {
+      const target = document.getElementById(this.dataset.target);
+      target.type = target.type === "password" ? "text" : "password";
+    });
+  </script>
+</body>
+</html>

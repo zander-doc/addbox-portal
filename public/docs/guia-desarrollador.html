@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Guía del Desarrollador — Setup Inicial ADDBOX LLC</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+font-family: 'Inter', 'Segoe UI', sans-serif;
+background: #f0f2f5;
+color: #1a1a2e;
+line-height: 1.7;
+}
+.guide-container {
+max-width: 960px;
+margin: 0 auto;
+padding: 40px 24px;
+}
+.guide-header {
+text-align: center;
+margin-bottom: 40px;
+}
+.guide-header h1 {
+font-size: 2rem;
+margin-bottom: 8px;
+}
+.guide-header p {
+color: #666;
+font-size: 1rem;
+}
+.badge {
+display: inline-block;
+padding: 4px 12px;
+border-radius: 20px;
+font-size: 0.75rem;
+font-weight: 600;
+margin-top: 12px;
+}
+.badge-dev { background: #e3f2fd; color: #1565c0; }
+.section {
+background: #fff;
+border-radius: 16px;
+padding: 28px 24px;
+margin-bottom: 24px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+border-left: 5px solid #0984e3;
+}
+.section h2 {
+font-size: 1.3rem;
+margin-bottom: 8px;
+}
+.section small {
+display: block;
+color: #888;
+margin-bottom: 12px;
+font-size: 0.8rem;
+}
+.section p { color: #444; margin-bottom: 10px; }
+</style>
+<style>
+.code-block {
+background: #1a1a2e;
+color: #00d2ff;
+padding: 12px 14px;
+border-radius: 6px;
+font-family: "Courier New", monospace;
+font-size: 0.8rem;
+margin: 10px 0;
+overflow-x: auto;
+}
+ul, ol {
+margin-top: 8px;
+padding-left: 20px;
+color: #444;
+font-size: 0.9rem;
+}
+li { margin-bottom: 4px; }
+.tag {
+display: inline-block;
+padding: 2px 8px;
+border-radius: 10px;
+font-size: 0.7rem;
+background: #f3f0ff;
+color: #6c5ce7;
+margin-left: 4px;
+}
+.warning {
+background: #fff3cd;
+color: #856404;
+padding: 10px 14px;
+border-radius: 6px;
+border: 1px solid #ffe58f;
+font-size: 0.85rem;
+margin-top: 10px;
+}
+.ok {
+background: #d4edda;
+color: #155724;
+padding: 10px 14px;
+border-radius: 6px;
+border: 1px solid #c3e6cb;
+font-size: 0.85rem;
+margin-top: 10px;
+}
+.two-cols {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+gap: 16px;
+margin-top: 10px;
+}
+.mini-card {
+background: #f8f9fa;
+border-radius: 10px;
+padding: 12px 14px;
+font-size: 0.85rem;
+border: 1px solid #e0e0e0;
+}
+.footer {
+text-align: center;
+padding: 24px;
+color: #999;
+font-size: 0.8rem;
+}
+@media (max-width: 600px) {
+.guide-container { padding: 24px 16px; }
+.section { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="guide-container">
+
+<div class="guide-header">
+<h1>📗 Guía del Desarrollador</h1>
+<p>Setup inicial, master key, hash, roles y flujo técnico de instalación de ADDBOX LLC</p>
+<span class="badge badge-dev">👨‍💻 Uso interno — Desarrolladores</span>
+</div>
+<!-- SECCIÓN 1: Visión general -->
+<div class="section">
+<h2>1. Visión general del setup inicial</h2>
+<small>Qué hace el setup y por qué existe</small>
+<p>El setup inicial de ADDBOX LLC tiene como objetivo crear la <strong>primera cuenta administrativa</strong> del sistema, asociada al rol <code>jefe</code>. Este proceso se ejecuta una sola vez y queda bloqueado después de completarse.</p>
+<p>Elementos clave del setup:</p>
+<ul>
+<li>Generación de una <strong>master key</strong> única.</li>
+<li>Almacenamiento del <strong>hash SHA-256</strong> de la master key en la tabla <code>instalacion</code>.</li>
+<li>Creación de la cuenta del jefe en <strong>Supabase Auth</strong>.</li>
+<li>Inserción del perfil en la tabla <code>usuarios</code> con rol <code>jefe</code>.</li>
+<li>Marcado de <code>first_run = false</code> para impedir repetir el setup.</li>
+</ul>
+<div class="warning">⚠️ <strong>Importante:</strong> El flujo de setup debe considerarse una operación sensible. No debe exponerse públicamente ni dejarse accesible después de completado.</div>
+</div>
+
+<!-- SECCIÓN 2: Generación de la master key -->
+<div class="section">
+<h2>2. Generación de la master key</h2>
+<small>Ruta: /admin-dashboard/setup/dev-master-key.html</small>
+<p>La master key se genera desde una página de uso exclusivo del desarrollador:</p>
+<div class="code-block">/admin-dashboard/setup/dev-master-key.html</div>
+<p>Formato recomendado de la master key:</p>
+<div class="code-block">ADDBOX-OWNER-xxxxxxxx-xxxxxxxx-xxxxxxxx-xxxxxxxx</div>
+<p>Características:</p>
+<ul>
+<li>Debe ser <strong>aleatoria</strong> y <strong>difícil de adivinar</strong>.</li>
+<li>Se muestra una sola vez en pantalla.</li>
+<li>Puede descargarse como archivo <code>.key</code> o copiarse manualmente.</li>
+<li>No se almacena en texto plano en la base de datos, solo su hash.</li>
+</ul>
+<div class="warning">⚠️ La master key no es recuperable desde el sistema. Si se pierde, se debe regenerar el proceso de instalación (solo en entornos controlados).</div>
+</div>
+<!-- SECCIÓN 3: Hash SHA-256 y tabla instalacion -->
+<div class="section">
+<h2>3. Hash SHA-256 y tabla <code>instalacion</code></h2>
+<small>Cómo se almacena y valida la master key</small>
+<p>En lugar de guardar la master key en texto plano, el sistema guarda su <strong>hash SHA-256</strong> en la tabla <code>instalacion</code> de Supabase.</p>
+<p>Ejemplo conceptual:</p>
+<div class="code-block">// Pseudocódigo
+const masterKey = "ADDBOX-OWNER-...";
+const hash = sha256(masterKey);
+
+// Insertar en tabla instalacion
+{
+  id: 1,
+  master_key_hash: hash,
+  first_run: true,
+  created_at: ...
+}</div>
+<p>Propiedades importantes:</p>
+<ul>
+<li>El hash SHA-256 es <strong>irreversible</strong>: no se puede obtener la clave original desde la base de datos.</li>
+<li>La validación se hace comparando <code>sha256(masterKeyIngresada)</code> con el valor almacenado.</li>
+<li>La tabla <code>instalacion</code> debe tener un único registro activo.</li>
+</ul>
+<div class="ok">✅ Buenas prácticas: limitar el acceso a la tabla <code>instalacion</code> mediante RLS y roles de servicio.</div>
+</div>
+
+<!-- SECCIÓN 4: Flujo técnico de creación del jefe -->
+<div class="section">
+<h2>4. Flujo técnico de creación del jefe</h2>
+<small>Ruta: /admin-dashboard/crear-jefe.html</small>
+<p>Cuando el jefe accede a <code>/admin-dashboard/crear-jefe.html</code> y envía el formulario, el sistema ejecuta el siguiente flujo:</p>
+<ol>
+<li>Valida que todos los campos estén completos.</li>
+<li>Valida que la contraseña cumpla con la longitud mínima.</li>
+<li>Calcula <code>sha256(masterKeyIngresada)</code> y la compara con <code>master_key_hash</code> en <code>instalacion</code>.</li>
+<li>Si la master key es correcta:
+<ul>
+<li>Crea el usuario en <strong>Supabase Auth</strong> (email + contraseña).</li>
+<li>Inserta el perfil en la tabla <code>usuarios</code> con rol <code>jefe</code>.</li>
+<li>Actualiza <code>first_run = false</code> en <code>instalacion</code>.</li>
+</ul>
+</li>
+<li>Redirige al login: <code>/admin-dashboard/inicio-de-sesion.html</code>.</li>
+</ol>
+<div class="two-cols">
+<div class="mini-card">
+<strong>Supabase Auth</strong> <span class="tag">auth</span><br>
+- Crea el usuario con email y contraseña.<br>
+- Maneja login, logout y recuperación de contraseña.
+</div>
+<div class="mini-card">
+<strong>Tabla usuarios</strong> <span class="tag">perfil</span><br>
+- Guarda nombre, rol, email, metadatos.<br>
+- Se usa para permisos y vistas internas.
+</div>
+</div>
+</div>
+<!-- SECCIÓN 5: first_run y bloqueo del setup -->
+<div class="section">
+<h2>5. Campo <code>first_run</code> y bloqueo del setup</h2>
+<small>Control de una sola ejecución</small>
+<p>El campo <code>first_run</code> en la tabla <code>instalacion</code> indica si el sistema ya fue configurado.</p>
+<ul>
+<li><code>first_run = true</code> → el setup aún no se ha completado.</li>
+<li><code>first_run = false</code> → el setup ya fue ejecutado y debe bloquearse.</li>
+</ul>
+<p>El frontend y/o backend deben:</p>
+<ul>
+<li>Impedir acceso a <code>crear-jefe.html</code> si <code>first_run = false</code>.</li>
+<li>Redirigir a login o dashboard si alguien intenta acceder al setup después de completado.</li>
+</ul>
+<div class="warning">⚠️ Nunca permitas que <code>first_run</code> vuelva a <code>true</code> en producción, salvo en un proceso controlado de reinstalación.</div>
+</div>
+
+<!-- SECCIÓN 6: Validación de rol "jefe" -->
+<div class="section">
+<h2>6. Validación del rol <code>jefe</code></h2>
+<small>Permisos y acceso al dashboard</small>
+<p>El rol <code>jefe</code> es el rol con <strong>acceso total</strong> al sistema. Algunas consideraciones:</p>
+<ul>
+<li>El perfil del jefe en la tabla <code>usuarios</code> debe tener <code>rol = 'jefe'</code>.</li>
+<li>El dashboard principal debe validar el rol antes de mostrar módulos sensibles.</li>
+<li>Las políticas RLS en Supabase deben considerar el rol para permitir o denegar operaciones.</li>
+</ul>
+<p>Ejemplo conceptual de perfil:</p>
+<div class="code-block">{
+  id: "...",
+  auth_user_id: "...",
+  nombre: "Carlos Rodríguez",
+  email: "carlos@addbox.com",
+  rol: "jefe",
+  creado_en: "2026-05-19T..."
+}</div>
+</div>
+<!-- SECCIÓN 7: Errores comunes y debugging -->
+<div class="section">
+<h2>7. Errores comunes y debugging</h2>
+<small>Checklist rápido para desarrolladores</small>
+<p>Durante el setup pueden aparecer errores. Algunos puntos a revisar:</p>
+<ul>
+<li><strong>"Master key incorrecta"</strong> → verificar que el hash se esté calculando con el mismo algoritmo y encoding.</li>
+<li><strong>"User already registered"</strong> → el email ya existe en Supabase Auth; eliminarlo desde el dashboard de Supabase o usar otro correo.</li>
+<li><strong>"Error al guardar perfil"</strong> → revisar RLS y estructura de la tabla <code>usuarios</code>.</li>
+<li><strong>"Error al verificar instalación"</strong> → revisar conexión a Supabase, URL y claves de servicio.</li>
+</ul>
+<div class="ok">✅ Recomendación: mantener un entorno de pruebas donde se pueda resetear la tabla <code>instalacion</code> y los usuarios sin afectar producción.</div>
+</div>
+
+<!-- SECCIÓN 8: Buenas prácticas -->
+<div class="section">
+<h2>8. Buenas prácticas para el setup</h2>
+<small>Recomendaciones para entornos reales</small>
+<ul>
+<li>Restringir el acceso a <code>/setup/dev-master-key.html</code> solo a entornos internos o protegidos.</li>
+<li>No exponer la master key en logs, consola o herramientas de monitoreo.</li>
+<li>Usar HTTPS en todo el flujo de setup.</li>
+<li>Documentar quién tiene acceso a la master key y cómo se entrega al jefe.</li>
+<li>Verificar que <code>first_run</code> se actualiza correctamente después del setup.</li>
+</ul>
+</div>
+
+<div class="footer">
+© ADDBOX LLC — Guía del Desarrollador · Setup inicial y flujo técnico<br>
+Versión 1.0 · Generado el 19 de mayo de 2026
+</div>
+
+</div>
+</body>
+</html>

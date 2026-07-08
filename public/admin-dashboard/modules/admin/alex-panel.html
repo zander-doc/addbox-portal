@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Panel de Alex — ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .alex-admin { padding: 24px; max-width: 1200px; margin: 0 auto; }
+    .alex-admin h1 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+    .alex-admin h1 i { color: #6c5ce7; }
+
+    .alex-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .alex-tab { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #aaa; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .alex-tab.active { background: #6c5ce7; color: #fff; border-color: #6c5ce7; }
+    .alex-tab:hover { background: rgba(108,92,231,0.2); color: #fff; }
+
+    .alex-section { display: none; }
+    .alex-section.active { display: block; }
+
+    .alex-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+    .alex-card h3 { font-size: 14px; color: #9ca3af; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .alex-stat { font-size: 28px; font-weight: 800; color: #fff; }
+    .alex-stat-label { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+
+    .alex-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+
+    .alex-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .alex-table th { padding: 10px 12px; text-align: left; color: #9ca3af; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 11px; text-transform: uppercase; }
+    .alex-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; }
+    .alex-table tr:hover { background: rgba(255,255,255,0.03); }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .badge-positive { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .badge-negative { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+    textarea.alex-textarea { width: 100%; min-height: 120px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; padding: 12px; font-size: 13px; resize: vertical; }
+    .alex-btn { padding: 8px 16px; background: #6c5ce7; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .alex-btn:hover { background: #5a4bd4; }
+    .alex-btn-danger { background: #ef4444; }
+    .alex-btn-danger:hover { background: #dc2626; }
+
+    .alex-doc-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .alex-doc-content { flex: 1; font-size: 13px; color: #ddd; white-space: pre-wrap; max-height: 60px; overflow: hidden; }
+    .alex-doc-date { font-size: 11px; color: #666; margin-top: 4px; }
+
+    @media (max-width: 768px) { .alex-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="alex-admin">
+        <h1><i class="fa fa-robot"></i> Panel de Alex</h1>
+
+        <!-- Tabs -->
+        <div class="alex-tabs">
+          <button class="alex-tab active" data-tab="metricas">📊 Métricas</button>
+          <button class="alex-tab" data-tab="conversaciones">💬 Conversaciones</button>
+          <button class="alex-tab" data-tab="feedback">👍 Feedback</button>
+          <button class="alex-tab" data-tab="documentos">📄 Documentos RAG</button>
+          <button class="alex-tab" data-tab="config">⚙️ Configuración</button>
+        </div>
+
+        <!-- Métricas -->
+        <div class="alex-section active" id="sec-metricas">
+          <div class="alex-stats-grid">
+            <div class="alex-card">
+              <div class="alex-stat" id="stat-total-msgs">—</div>
+              <div class="alex-stat-label">Mensajes totales</div>
+            </div>
+            <div class="alex-card">
+              <div class="alex-stat" id="stat-users">—</div>
+              <div class="alex-stat-label">Usuarios únicos</div>
+            </div>
+            <div class="alex-card">
+              <div class="alex-stat" id="stat-positive">—</div>
+              <div class="alex-stat-label">Feedback positivo</div>
+            </div>
+            <div class="alex-card">
+              <div class="alex-stat" id="stat-negative">—</div>
+              <div class="alex-stat-label">Feedback negativo</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversaciones -->
+        <div class="alex-section" id="sec-conversaciones">
+          <div class="alex-card">
+            <h3>Últimas conversaciones</h3>
+            <table class="alex-table">
+              <thead><tr><th>Usuario</th><th>Mensaje</th><th>Fecha</th></tr></thead>
+              <tbody id="conv-table">
+                <tr><td colspan="3" style="text-align:center;color:#666;">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Feedback -->
+        <div class="alex-section" id="sec-feedback">
+          <div class="alex-card">
+            <h3>Feedback reciente</h3>
+            <table class="alex-table">
+              <thead><tr><th>Usuario</th><th>Rating</th><th>Comentario</th><th>Fecha</th></tr></thead>
+              <tbody id="feedback-table">
+                <tr><td colspan="4" style="text-align:center;color:#666;">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Documentos RAG -->
+        <div class="alex-section" id="sec-documentos">
+          <div class="alex-card">
+            <h3>Agregar documento al RAG</h3>
+            <textarea class="alex-textarea" id="doc-content" placeholder="Pega aquí el contenido del documento (manual, procedimiento, regla de negocio)..."></textarea>
+            <div style="margin-top:10px;display:flex;gap:8px;">
+              <button class="alex-btn" id="btn-upload-doc">Subir documento</button>
+              <span id="doc-status" style="font-size:12px;color:#9ca3af;align-self:center;"></span>
+            </div>
+          </div>
+          <div class="alex-card">
+            <h3>Documentos existentes</h3>
+            <div id="docs-list">Cargando...</div>
+          </div>
+        </div>
+
+        <!-- Configuración -->
+        <div class="alex-section" id="sec-config">
+          <div class="alex-card">
+            <h3>System Prompt actual</h3>
+            <textarea class="alex-textarea" id="config-prompt" style="min-height:200px;" placeholder="Cargando..."></textarea>
+            <div style="margin-top:10px;">
+              <button class="alex-btn" id="btn-save-config">Guardar configuración</button>
+            </div>
+          </div>
+          <div class="alex-card">
+            <h3>Estado del servidor</h3>
+            <div id="server-status" style="font-size:13px;color:#9ca3af;">Verificando...</div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-client.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+
+  <script>
+    const ALEX_API = window.ALEX_API_URL || "http://localhost:3100/api";
+
+    // Tabs
+    document.querySelectorAll(".alex-tab").forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll(".alex-tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".alex-section").forEach(s => s.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(`sec-${tab.dataset.tab}`).classList.add("active");
+      };
+    });
+
+    // Cargar métricas
+    async function loadMetrics() {
+      try {
+        const { data: msgs } = await supabaseClient.from("alex_context").select("user_id", { count: "exact" });
+        const { data: fb } = await supabaseClient.from("alex_feedback").select("value");
+
+        const uniqueUsers = new Set(msgs?.map(m => m.user_id) || []);
+        const positive = fb?.filter(f => f.value > 0).length || 0;
+        const negative = fb?.filter(f => f.value < 0).length || 0;
+
+        document.getElementById("stat-total-msgs").textContent = msgs?.length || 0;
+        document.getElementById("stat-users").textContent = uniqueUsers.size;
+        document.getElementById("stat-positive").textContent = positive;
+        document.getElementById("stat-negative").textContent = negative;
+      } catch (e) {
+        console.error("Error cargando métricas:", e);
+      }
+    }
+
+    // Cargar conversaciones
+    async function loadConversations() {
+      const { data } = await supabaseClient
+        .from("alex_context")
+        .select("user_id, message, created_at")
+        .order("created_at", { ascending: false })
+        .limit(30);
+
+      const tbody = document.getElementById("conv-table");
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;">Sin conversaciones</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(m => `
+        <tr>
+          <td>${m.user_id?.slice(0, 8) || "anon"}...</td>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.message}</td>
+          <td>${new Date(m.created_at).toLocaleString("es-MX")}</td>
+        </tr>
+      `).join("");
+    }
+
+    // Cargar feedback
+    async function loadFeedback() {
+      const { data } = await supabaseClient
+        .from("alex_feedback")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      const tbody = document.getElementById("feedback-table");
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#666;">Sin feedback</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(f => `
+        <tr>
+          <td>${f.user_id?.slice(0, 8) || "anon"}...</td>
+          <td><span class="badge ${f.value > 0 ? 'badge-positive' : 'badge-negative'}">${f.value > 0 ? '👍' : '👎'}</span></td>
+          <td>${f.comment || "—"}</td>
+          <td>${new Date(f.created_at).toLocaleString("es-MX")}</td>
+        </tr>
+      `).join("");
+    }
+
+    // Cargar documentos
+    async function loadDocs() {
+      try {
+        const res = await fetch(`${ALEX_API}/docs`);
+        const { docs } = await res.json();
+        const container = document.getElementById("docs-list");
+
+        if (!docs || docs.length === 0) {
+          container.innerHTML = '<div style="color:#666;font-size:13px;">No hay documentos. Sube el primero arriba.</div>';
+          return;
+        }
+
+        container.innerHTML = docs.map(d => `
+          <div class="alex-doc-item">
+            <div>
+              <div class="alex-doc-content">${d.content.slice(0, 150)}${d.content.length > 150 ? '...' : ''}</div>
+              <div class="alex-doc-date">${new Date(d.created_at).toLocaleString("es-MX")}</div>
+            </div>
+            <button class="alex-btn alex-btn-danger" onclick="deleteDoc(${d.id})" style="margin-left:12px;padding:4px 10px;font-size:11px;">Eliminar</button>
+          </div>
+        `).join("");
+      } catch (e) {
+        document.getElementById("docs-list").innerHTML = '<div style="color:#ef4444;">Error conectando con el servidor de Alex.</div>';
+      }
+    }
+
+    // Subir documento
+    document.getElementById("btn-upload-doc").onclick = async () => {
+      const content = document.getElementById("doc-content").value.trim();
+      const status = document.getElementById("doc-status");
+      if (!content) { status.textContent = "Escribe algo primero."; return; }
+
+      status.textContent = "Subiendo...";
+      try {
+        const res = await fetch(`${ALEX_API}/docs`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          status.textContent = "✅ Documento agregado.";
+          document.getElementById("doc-content").value = "";
+          loadDocs();
+        } else {
+          status.textContent = `❌ ${data.error}`;
+        }
+      } catch (e) {
+        status.textContent = "❌ Error de conexión.";
+      }
+    };
+
+    // Eliminar documento
+    async function deleteDoc(id) {
+      if (!confirm("¿Eliminar este documento del RAG?")) return;
+      await fetch(`${ALEX_API}/docs/${id}`, { method: "DELETE" });
+      loadDocs();
+    }
+
+    // Health check
+    async function checkServer() {
+      try {
+        const res = await fetch(`${ALEX_API}/health`);
+        const data = await res.json();
+        document.getElementById("server-status").innerHTML = `
+          <span style="color:#22c55e;">● Online</span> — ${data.agent} v${data.version}
+        `;
+      } catch (e) {
+        document.getElementById("server-status").innerHTML = '<span style="color:#ef4444;">● Offline</span> — El servidor no responde en puerto 3100.';
+      }
+    }
+
+    // Init
+    loadMetrics();
+    loadConversations();
+    loadFeedback();
+    loadDocs();
+    checkServer();
+  </script>
+</body>
+</html>

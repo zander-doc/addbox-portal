@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Roles y Permisos — ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ---------------------------------------------------------------
+       ROLES Y PERMISOS — DISEÑO PREMIUM
+    --------------------------------------------------------------- */
+
+    /* Cards de roles */
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .role-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .role-card:hover {
+      background: rgba(255,255,255,0.07);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+    .role-card.selected {
+      border-color: #6c5ce7;
+      box-shadow: 0 0 0 2px rgba(108,92,231,0.3);
+    }
+    .role-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .role-card[data-role="jefe"]::before { background: linear-gradient(90deg, #6c5ce7, #a29bfe); }
+    .role-card[data-role="admin"]::before { background: linear-gradient(90deg, #00cec9, #55efc4); }
+    .role-card[data-role="supervisor"]::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .role-card[data-role="almacenista"]::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .role-card[data-role="invitado"]::before { background: linear-gradient(90deg, #636e72, #b2bec3); }
+
+    .role-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: #fff;
+      margin: 0 auto 12px;
+    }
+    .role-name { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .role-desc { font-size: 11px; color: #9ca3af; margin-bottom: 10px; line-height: 1.4; }
+    .role-users-count {
+      font-size: 12px; color: #6c5ce7; font-weight: 600;
+      background: rgba(108,92,231,0.1);
+      padding: 4px 10px; border-radius: 8px;
+      display: inline-block;
+    }
+
+    /* Sección título */
+    .section-header {
+      font-size: 15px; font-weight: 700; color: #fff;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-header i { color: #6c5ce7; font-size: 14px; }
+
+    /* Matriz de permisos */
+    .permisos-table-wrap {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      overflow-x: auto;
+      margin-bottom: 28px;
+    }
+    .permisos-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 700px;
+    }
+    .permisos-table th {
+      padding: 12px 14px;
+      text-align: center;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #9ca3af;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      letter-spacing: 0.5px;
+    }
+    .permisos-table th:first-child { text-align: left; }
+    .permisos-table td {
+      padding: 10px 14px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: #ddd;
+    }
+    .permisos-table td:first-child {
+      text-align: left;
+      font-size: 12px;
+      color: #ccc;
+    }
+    .permisos-table tr:hover { background: rgba(255,255,255,0.03); }
+    .permisos-table .cat-row td {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6c5ce7;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding-top: 16px;
+      border-bottom: none;
+      background: transparent;
+    }
+    .perm-yes { color: #22c55e; font-size: 14px; }
+    .perm-no { color: #ef4444; font-size: 12px; opacity: 0.5; }
+
+    /* Usuarios del rol */
+    .role-users-section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .role-user-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .role-user-item:last-child { border-bottom: none; }
+    .role-user-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(108,92,231,0.15);
+      display: flex; align-items: center; justify-content: center;
+      color: #a29bfe; font-size: 14px;
+    }
+    .role-user-info { flex: 1; }
+    .role-user-name { font-size: 13px; color: #fff; font-weight: 600; }
+    .role-user-email { font-size: 11px; color: #9ca3af; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .roles-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .roles-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 24px;">
+
+        <!-- Header -->
+        <header class="topbar">
+          <h1><i class="fa fa-shield-halved" style="color:#6c5ce7;"></i> Roles y Permisos</h1>
+          <div class="top-actions">
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- Cards de Roles -->
+        <section>
+          <h3 class="section-header"><i class="fa fa-id-badge"></i> Roles del Sistema</h3>
+          <div class="roles-grid" id="rolesGrid"></div>
+        </section>
+
+        <!-- Usuarios del rol seleccionado -->
+        <section class="role-users-section" id="roleUsersSection" style="display:none;">
+          <h3 class="section-header"><i class="fa fa-users"></i> Usuarios con rol: <span id="roleUsersTitle" style="color:#a29bfe;"></span></h3>
+          <div id="roleUsersList"></div>
+        </section>
+
+        <!-- Matriz de Permisos -->
+        <section>
+          <h3 class="section-header"><i class="fa fa-table-cells"></i> Matriz de Permisos</h3>
+          <div class="permisos-table-wrap">
+            <table class="permisos-table" id="permisosTable"></table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script>
+    function logout() { window.location.href = "../../inicio-de-sesion.html"; }
+
+    // --- Datos de roles --------------------------------------------------------
+    const ROLES = [
+      { id: "jefe", nombre: "Jefe", icon: "fa-crown", color: "linear-gradient(135deg,#6c5ce7,#a29bfe)", desc: "Acceso total al sistema. Control absoluto." },
+      { id: "admin", nombre: "Administrador", icon: "fa-user-gear", color: "linear-gradient(135deg,#00cec9,#55efc4)", desc: "Gestión completa. Usuarios, config y reportes." },
+      { id: "supervisor", nombre: "Supervisor", icon: "fa-user-tie", color: "linear-gradient(135deg,#f59e0b,#fbbf24)", desc: "Auditoría, conteos físicos y aprobaciones." },
+      { id: "almacenista", nombre: "Almacenista", icon: "fa-user-helmet-safety", color: "linear-gradient(135deg,#3b82f6,#60a5fa)", desc: "Entradas, salidas y consulta de stock." },
+      { id: "invitado", nombre: "Invitado", icon: "fa-user", color: "linear-gradient(135deg,#636e72,#b2bec3)", desc: "Acceso limitado. Solo autoservicio." },
+    ];
+
+    const PERMISOS = {
+      "Inventario": {
+        "Registrar entradas": { jefe: true, admin: true, supervisor: false, almacenista: true, invitado: false },
+        "Registrar salidas": { jefe: true, admin: true, supervisor: false, almacenista: true, invitado: false },
+        "Registrar transferencias": { jefe: true, admin: true, supervisor: false, almacenista: false, invitado: false },
+        "Registrar ajustes": { jefe: true, admin: true, supervisor: false, almacenista: false, invitado: false },
+        "Consultar stock (obras asignadas)": { jefe: true, admin: true, supervisor: true, almacenista: true, invitado: false },
+        "Consultar stock consolidado": { jefe: true, admin: true, supervisor: true, almacenista: false, invitado: false },
+      },
+      "Auditoría": {
+        "Iniciar conteo físico": { jefe: true, admin: true, supervisor: true, almacenista: false, invitado: false },
+        "Aprobar reconciliación": { jefe: true, admin: true, supervisor: true, almacenista: false, invitado: false },
+        "Rechazar reconciliación": { jefe: true, admin: true, supervisor: true, almacenista: false, invitado: false },
+      },
+      "Administración": {
+        "Gestionar obras": { jefe: true, admin: true, supervisor: false, almacenista: false, invitado: false },
+        "Configurar umbrales": { jefe: true, admin: true, supervisor: false, almacenista: false, invitado: false },
+        "Gestionar usuarios": { jefe: true, admin: true, supervisor: false, almacenista: false, invitado: false },
+      },
+      "Reportes": {
+        "Ver reportes": { jefe: true, admin: true, supervisor: true, almacenista: true, invitado: false },
+        "Exportar reportes": { jefe: true, admin: true, supervisor: false, almacenista: false, invitado: false },
+      },
+    };
+
+    // --- Render ----------------------------------------------------------------
+    let usuariosPorRol = {};
+
+    async function init() {
+      await cargarUsuarios();
+      renderRoles();
+      renderMatriz();
+    }
+
+    async function cargarUsuarios() {
+      const db = window.supabaseClient;
+      if (!db) return;
+
+      const { data } = await db.from("usuarios").select("id, nombre, email, rol, estado").order("nombre");
+      usuariosPorRol = {};
+      (data || []).forEach(u => {
+        const rol = u.rol || "invitado";
+        if (!usuariosPorRol[rol]) usuariosPorRol[rol] = [];
+        usuariosPorRol[rol].push(u);
+      });
+    }
+
+    function renderRoles() {
+      const grid = document.getElementById("rolesGrid");
+      grid.innerHTML = ROLES.map(r => {
+        const count = (usuariosPorRol[r.id] || []).length;
+        return `
+          <div class="role-card" data-role="${r.id}" onclick="selectRole('${r.id}')">
+            <div class="role-icon" style="background:${r.color};"><i class="fa ${r.icon}"></i></div>
+            <div class="role-name">${r.nombre}</div>
+            <div class="role-desc">${r.desc}</div>
+            <div class="role-users-count"><i class="fa fa-users" style="margin-right:4px;"></i> ${count} usuario${count !== 1 ? 's' : ''}</div>
+          </div>`;
+      }).join("");
+    }
+
+    function renderMatriz() {
+      const table = document.getElementById("permisosTable");
+      const roles = ["jefe", "admin", "supervisor", "almacenista", "invitado"];
+
+      let html = `<thead><tr><th style="min-width:220px;">Permiso</th>`;
+      roles.forEach(r => { html += `<th>${r.charAt(0).toUpperCase() + r.slice(1)}</th>`; });
+      html += `</tr></thead><tbody>`;
+
+      Object.entries(PERMISOS).forEach(([categoria, permisos]) => {
+        html += `<tr class="cat-row"><td colspan="${roles.length + 1}">${categoria}</td></tr>`;
+        Object.entries(permisos).forEach(([permiso, valores]) => {
+          html += `<tr><td>${permiso}</td>`;
+          roles.forEach(r => {
+            html += valores[r]
+              ? `<td><span class="perm-yes"><i class="fa fa-circle-check"></i></span></td>`
+              : `<td><span class="perm-no"><i class="fa fa-circle-xmark"></i></span></td>`;
+          });
+          html += `</tr>`;
+        });
+      });
+
+      html += `</tbody>`;
+      table.innerHTML = html;
+    }
+
+    function selectRole(rolId) {
+      // Marcar card
+      document.querySelectorAll(".role-card").forEach(c => c.classList.remove("selected"));
+      document.querySelector(`[data-role="${rolId}"]`)?.classList.add("selected");
+
+      // Mostrar usuarios
+      const section = document.getElementById("roleUsersSection");
+      const title = document.getElementById("roleUsersTitle");
+      const list = document.getElementById("roleUsersList");
+      const rol = ROLES.find(r => r.id === rolId);
+
+      title.textContent = rol?.nombre || rolId;
+      section.style.display = "block";
+
+      const usuarios = usuariosPorRol[rolId] || [];
+      if (usuarios.length === 0) {
+        list.innerHTML = '<div style="color:#9ca3af;font-size:13px;padding:10px;">No hay usuarios con este rol.</div>';
+      } else {
+        list.innerHTML = usuarios.map(u => `
+          <div class="role-user-item">
+            <div class="role-user-avatar"><i class="fa fa-user"></i></div>
+            <div class="role-user-info">
+              <div class="role-user-name">${u.nombre || "Sin nombre"}</div>
+              <div class="role-user-email">${u.email || "—"}</div>
+            </div>
+            <span style="font-size:11px;color:${u.estado === 'activo' ? '#22c55e' : '#9ca3af'};background:${u.estado === 'activo' ? 'rgba(34,197,94,0.1)' : 'rgba(156,163,175,0.1)'};padding:3px 8px;border-radius:6px;">${u.estado || "—"}</span>
+          </div>`).join("");
+      }
+
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    // Init
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>

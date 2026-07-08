@@ -1,0 +1,25 @@
+{
+  "enabled": true,
+  "name": "Auto-analyze and modify system files",
+  "description": "Automatically analyze images and modify code based on your admin dashboard system",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.gif",
+      "*.svg",
+      "*.webp",
+      "*.html",
+      "*.css",
+      "*.js",
+      "*.sql"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "You are working in an admin dashboard project located at d:\\alexander\\arte\\addbox_a5grafic\\Addbox\\frontend\\public\\admin-dashboard\n\nThe system uses:\n- HTML/CSS/JavaScript (vanilla, no framework)\n- Node.js/Express backend (in src/ai/alex/server)\n- MySQL database (SQL files in sql/ directory)\n- Modular structure with components, modules, and assets folders\n\nWhen analyzing:\n1. First, read the image to understand what UI/UX changes are needed\n2. Read the current code files in the relevant module (e.g., if modifying dashboard, read files from modules/dashboard/)\n3. Make precise code modifications to match the design in the image\n4. Ensure consistency with the existing code style and structure\n5. Check for related files that might need updates (CSS, JS, HTML templates)\n\nAlways:\n- Match the existing code style\n- Update both HTML and CSS/JS when UI changes\n- Consider database schema changes if data structures are modified\n- Test that modifications work with the existing architecture"
+  }
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Asignación Masiva de Productos — ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../../assets/css/toast.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .asig-container { max-width: 900px; }
+    .asig-step { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .asig-step h3 { font-size: 14px; color: #9ca3af; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+    .asig-step h3 .step-num { background: #6c5ce7; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+
+    .asig-select { width: 100%; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.3); color: #fff; font-size: 13px; }
+    .asig-select:focus { border-color: #6c5ce7; outline: none; }
+
+    .productos-search { width: 100%; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.3); color: #fff; font-size: 13px; margin-bottom: 12px; }
+    .productos-search:focus { border-color: #00CEC9; outline: none; }
+
+    .productos-list { max-height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; }
+    .producto-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; }
+    .producto-row:hover { background: rgba(108,92,231,0.08); }
+    .producto-row:last-child { border-bottom: none; }
+    .producto-row input[type="checkbox"] { accent-color: #6c5ce7; width: 16px; height: 16px; }
+    .producto-row .prod-info { flex: 1; }
+    .producto-row .prod-name { font-size: 13px; color: #ddd; }
+    .producto-row .prod-code { font-size: 11px; color: #636e72; }
+    .producto-row .prod-qty { width: 80px; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; background: rgba(0,0,0,0.3); color: #fff; font-size: 13px; text-align: center; }
+    .producto-row .prod-qty:focus { border-color: #00CEC9; outline: none; }
+
+    .categoria-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(108,92,231,0.1); border-bottom: 1px solid rgba(108,92,231,0.2); cursor: pointer; position: sticky; top: 0; z-index: 1; transition: background 0.2s; }
+    .categoria-header:hover { background: rgba(108,92,231,0.18); }
+    .categoria-header .cat-icon { font-size: 14px; }
+    .categoria-header .cat-name { font-size: 13px; font-weight: 600; color: #a29bfe; flex: 1; }
+    .categoria-header .cat-count { font-size: 11px; background: rgba(108,92,231,0.3); color: #ddd; padding: 2px 8px; border-radius: 10px; }
+
+    .resumen-cat-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 14px; }
+    .resumen-cat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(0,206,201,0.2); border-radius: 10px; padding: 14px; }
+    .resumen-cat-card .rcc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .resumen-cat-card .rcc-title { font-size: 13px; font-weight: 600; color: #00CEC9; }
+    .resumen-cat-card .rcc-count { font-size: 11px; background: rgba(0,206,201,0.15); color: #00CEC9; padding: 2px 8px; border-radius: 8px; }
+    .resumen-cat-card .rcc-items { font-size: 12px; color: #9ca3af; max-height: 80px; overflow-y: auto; }
+    .resumen-cat-card .rcc-item { padding: 2px 0; display: flex; justify-content: space-between; }
+    .resumen-cat-card .rcc-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .resumen-cat-card .rcc-item-qty { color: #ddd; font-weight: 600; margin-left: 8px; }
+
+    .asig-summary { background: rgba(108,92,231,0.1); border: 1px solid rgba(108,92,231,0.3); border-radius: 10px; padding: 14px 18px; margin-top: 12px; }
+    .asig-summary .summary-line { font-size: 13px; color: #ddd; margin-bottom: 4px; }
+    .asig-summary .summary-total { font-size: 16px; font-weight: 700; color: #fff; margin-top: 8px; }
+
+    .btn-asignar-masivo { background: #6c5ce7; color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-asignar-masivo:hover { background: #5a4bd6; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(108,92,231,0.3); }
+    .btn-asignar-masivo:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-select-all { background: rgba(0,206,201,0.15); color: #00CEC9; border: 1px solid rgba(0,206,201,0.3); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .btn-select-all:hover { background: rgba(0,206,201,0.25); }
+
+    .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 12px; overflow: hidden; display: none; }
+    .progress-bar.active { display: block; }
+    .progress-bar .progress-fill { height: 100%; background: #6c5ce7; border-radius: 2px; transition: width 0.3s; width: 0%; }
+
+    .result-msg { margin-top: 12px; padding: 12px; border-radius: 8px; font-size: 13px; display: none; }
+    .result-msg.success { display: block; background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+    .result-msg.error { display: block; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center asig-container" style="gap: 20px;">
+        <header class="topbar">
+          <h1><i class="fa fa-boxes-stacked" style="color:#6c5ce7;"></i> Asignación Masiva</h1>
+          <div class="top-actions">
+            <a href="./obras.html" style="color:#9ca3af;font-size:13px;text-decoration:none;"><i class="fa fa-arrow-left"></i> Volver a Obras</a>
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- Paso 1: Seleccionar obra -->
+        <div class="asig-step">
+          <h3><span class="step-num">1</span> Seleccionar obra destino</h3>
+          <select class="asig-select" id="selectObraDestino">
+            <option value="">Seleccionar obra...</option>
+          </select>
+        </div>
+
+        <!-- Paso 2: Seleccionar productos -->
+        <div class="asig-step">
+          <h3><span class="step-num">2</span> Seleccionar productos y cantidades</h3>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+            <input type="text" class="productos-search" id="searchProductos" placeholder="Buscar producto por nombre o código..." style="flex:1;min-width:200px;">
+            <select class="asig-select" id="filtroCategoria" style="width:auto;min-width:160px;">
+              <option value="">Todas las categorías</option>
+            </select>
+            <button class="btn-select-all" id="btnClearSelection" style="background:rgba(239,68,68,0.15);color:#ef4444;border-color:rgba(239,68,68,0.3);">Borrar selección</button>
+            <span id="contadorSeleccion" style="font-size:12px;color:#9ca3af;align-self:center;white-space:nowrap;">0 seleccionados</span>
+          </div>
+          <div class="productos-list" id="productosLista">
+            <div style="padding:20px;text-align:center;color:#636e72;">Cargando productos...</div>
+          </div>
+        </div>
+
+        <!-- Paso 3: Resumen y confirmar -->
+        <div class="asig-step">
+          <h3><span class="step-num">3</span> Confirmar asignación</h3>
+          <div id="resumenPorCategoria"></div>
+          <div class="asig-summary" id="resumenAsignacion">
+            <div class="summary-line">Selecciona productos arriba para ver el resumen.</div>
+          </div>
+          <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="result-msg" id="resultMsg"></div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn-asignar-masivo" id="btnAsignarMasivo" disabled>
+              <i class="fa fa-paper-plane"></i> Asignar productos a la obra
+            </button>
+            <button class="btn-asignar-masivo" id="btnGenerarDoc" disabled style="background:#00CEC9;">
+              <i class="fa fa-file-contract"></i> Generar documento de salida
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-client.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+
+  <!-- jsPDF + autoTable para generar PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Modal: Previsualización del documento -->
+  <div class="modal-overlay" id="modalPreview" style="display:none;">
+    <div class="modal-card" style="max-width:700px;max-height:90vh;overflow-y:auto;">
+      <h3><i class="fa fa-file-contract" style="color:#00CEC9;"></i> Previsualización — Orden de Salida</h3>
+      <div id="previewContent" style="margin:16px 0;"></div>
+      <div class="modal-actions">
+        <button class="btn-save" id="btnConfirmarDoc"><i class="fa fa-download"></i> Descargar PDF</button>
+        <button class="btn-save" id="btnGuardarDoc" style="background:#22c55e;"><i class="fa fa-floppy-disk"></i> Guardar en sistema</button>
+        <button class="btn-cancel" id="btnCerrarPreview">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./asignacion-masiva.controller.js"></script>
+  <script>function logout(){window.location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

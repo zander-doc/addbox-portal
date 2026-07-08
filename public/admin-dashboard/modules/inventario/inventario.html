@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Inventario por Obra - ADDBOX Inventory</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Modal */
+    .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal-card { background:#1a1a2e; border-radius:12px; padding:24px; width:90%; max-width:520px; max-height:90vh; overflow-y:auto; }
+    .modal-card h3 { margin-bottom:16px; }
+    .modal-card label { display:block; font-size:0.8rem; margin-top:10px; color:#9ca3af; }
+    .modal-card input, .modal-card select, .modal-card textarea { width:100%; padding:8px 12px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; margin-top:4px; }
+    .modal-card textarea { resize:vertical; min-height:60px; }
+    .modal-card .modal-actions { display:flex; gap:10px; margin-top:16px; }
+    .modal-card .modal-actions button { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; }
+    .btn-save { background:#6c5ce7; color:#fff; }
+    .btn-cancel { background:#333; color:#fff; }
+    .hidden { display:none !important; }
+
+    /* Realtime indicator */
+    .realtime-indicator { display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:4px 10px; border-radius:20px; }
+    .realtime-indicator .dot { width:8px; height:8px; border-radius:50%; }
+    .realtime-indicator.connected .dot { background:#22c55e; box-shadow:0 0 6px #22c55e; }
+    .realtime-indicator.connected { color:#22c55e; background:rgba(34,197,94,0.1); }
+    .realtime-indicator.reconnecting .dot { background:#f97316; animation:pulse 1s infinite; }
+    .realtime-indicator.reconnecting { color:#f97316; background:rgba(249,115,22,0.1); }
+    .realtime-indicator.disconnected .dot { background:#ef4444; }
+    .realtime-indicator.disconnected { color:#ef4444; background:rgba(239,68,68,0.1); }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+    /* Obra selector */
+    .obra-selector { display:flex; align-items:center; gap:12px; }
+    .obra-selector select { padding:8px 14px; border:1px solid #333; border-radius:8px; background:#111; color:#fff; font-size:14px; min-width:200px; }
+    .obra-selector label { font-size:13px; color:#9ca3af; white-space:nowrap; }
+
+    /* Critical products panel */
+    .panel-criticos { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:16px; }
+    .panel-criticos h3 { font-size:14px; color:#ef4444; margin-bottom:10px; }
+    .panel-criticos .critico-item { padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:13px; display:flex; justify-content:space-between; align-items:center; }
+    .panel-criticos .critico-item:last-child { border-bottom:none; }
+
+    /* Pagination */
+    .pagination { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; }
+    .pagination button { padding:6px 12px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; cursor:pointer; font-size:13px; }
+    .pagination button:hover:not(:disabled) { background:#222; border-color:#6c5ce7; }
+    .pagination button:disabled { opacity:0.4; cursor:not-allowed; }
+    .pagination .page-info { font-size:13px; color:#9ca3af; }
+
+    /* Alert badge colors in table */
+    .badge-critico { background:rgba(239,68,68,0.15); color:#ef4444; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600; }
+    .badge-alerta { background:rgba(249,115,22,0.15); color:#f97316; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600; }
+    .badge-normal { background:rgba(34,197,94,0.15); color:#22c55e; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600; }
+
+    /* Retry button */
+    .btn-retry { background:transparent; border:1px solid #ef4444; color:#ef4444; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:11px; margin-left:8px; }
+    .btn-retry:hover { background:rgba(239,68,68,0.1); }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 30px;">
+
+        <!-- Header -->
+        <header class="topbar">
+          <h1>Inventario por Obra</h1>
+          <div class="top-actions" style="display:flex;align-items:center;gap:12px;">
+            <div id="realtimeIndicator" class="realtime-indicator disconnected">
+              <span class="dot"></span>
+              <span id="realtimeLabel">Desconectado</span>
+              <button id="btnRetryConnection" class="btn-retry hidden" title="Reintentar conexión">
+                <i class="fa fa-rotate-right"></i>
+              </button>
+            </div>
+            <button class="primary" id="btnRegistrarMovimiento" style="padding:8px 16px;">
+              <i class="fa fa-plus"></i> Registrar movimiento
+            </button>
+            <button class="logout-btn" id="btnLogout"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- Obra Selector -->
+        <section class="obra-selector" id="sectionObraSelector">
+          <label for="selectObra"><i class="fa fa-building"></i> Obra:</label>
+          <select id="selectObra">
+            <option value="todas">Todas las obras</option>
+          </select>
+        </section>
+
+        <!-- KPIs -->
+        <section class="grid-cards">
+          <div class="card" style="padding:18px;">
+            <div>
+              <div class="card-title" style="font-size:13px;">Total productos</div>
+              <div class="card-value" id="kpi-total" style="font-size:26px;">—</div>
+            </div>
+            <i class="fa fa-box" style="font-size:28px;"></i>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div>
+              <div class="card-title" style="font-size:13px;">Valor inventario</div>
+              <div class="card-value" id="kpi-valor" style="font-size:26px;">—</div>
+            </div>
+            <i class="fa fa-dollar-sign" style="font-size:28px;"></i>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div>
+              <div class="card-title" style="font-size:13px;">Stock crítico</div>
+              <div class="card-value" id="kpi-critico" style="font-size:26px;color:#ef4444;">—</div>
+            </div>
+            <i class="fa fa-triangle-exclamation" style="font-size:28px;color:#ef4444;"></i>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div>
+              <div class="card-title" style="font-size:13px;">Productos activos</div>
+              <div class="card-value" id="kpi-activos" style="font-size:26px;color:#22c55e;">—</div>
+            </div>
+            <i class="fa fa-check-circle" style="font-size:28px;color:#22c55e;"></i>
+          </div>
+        </section>
+
+        <!-- Gráfica: Productos por Categoría -->
+        <section class="chart-section" style="margin-bottom:24px;">
+          <div class="chart-box">
+            <h3 style="font-size:14px;color:#9ca3af;margin-bottom:12px;">Productos por categoría</h3>
+            <div id="chart-productos-por-categoria" style="min-height:280px;">
+              <p style="text-align:center;color:#9ca3af;padding:20px;font-size:13px;">Cargando gráfica...</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Charts: Top 5, Tendencia, Valor por Categoría -->
+        <section id="charts-section" class="charts-section">
+          <div class="charts-grid">
+            <div class="chart-box">
+              <h3>Top 5 Productos por Stock</h3>
+              <div id="chart-top5-productos"></div>
+            </div>
+            <div class="chart-box">
+              <h3>Tendencia de Movimientos (30 días)</h3>
+              <div id="chart-tendencia-movimientos"></div>
+            </div>
+            <div class="chart-box">
+              <h3>Valor de Inventario por Categoría</h3>
+              <div id="chart-valor-por-categoria"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Panel de productos críticos -->
+        <section class="panel-criticos hidden" id="panelCriticos">
+          <h3><i class="fa fa-triangle-exclamation"></i> Productos con stock crítico</h3>
+          <div id="listaCriticos"></div>
+        </section>
+
+        <!-- Stock Table -->
+        <section class="historial">
+          <h3 style="font-size:14px;margin-bottom:12px;color:#9ca3af;">Stock actual</h3>
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Unidad</th>
+                <th>Cantidad</th>
+                <th>Estado alerta</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody id="tablaStock">
+              <tr><td colspan="6">Seleccione una obra para ver el stock...</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Historial de movimientos -->
+        <section class="historial">
+          <h3 style="font-size:14px;margin-bottom:12px;color:#9ca3af;">Últimos movimientos</h3>
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Usuario</th>
+                <th>Observación</th>
+              </tr>
+            </thead>
+            <tbody id="tablaMovimientos">
+              <tr><td colspan="6">Sin movimientos registrados.</td></tr>
+            </tbody>
+          </table>
+          <!-- Pagination -->
+          <div class="pagination" id="paginacionMovimientos">
+            <button id="btnPagAnterior" disabled><i class="fa fa-chevron-left"></i> Anterior</button>
+            <span class="page-info" id="paginaInfo">Página 1</span>
+            <button id="btnPagSiguiente" disabled>Siguiente <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Registrar Movimiento -->
+  <div class="modal-overlay" id="modalMovimiento">
+    <div class="modal-card">
+      <h3><i class="fa fa-arrows-rotate"></i> Registrar Movimiento</h3>
+      <form id="formMovimiento">
+        <label>Tipo de movimiento</label>
+        <select id="mov-tipo" required>
+          <option value="">Seleccionar...</option>
+          <option value="entrada">Entrada</option>
+          <option value="salida">Salida</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="ajuste">Ajuste</option>
+        </select>
+
+        <label>Producto</label>
+        <select id="mov-producto" required>
+          <option value="">Seleccionar producto...</option>
+        </select>
+
+        <label>Obra origen</label>
+        <select id="mov-obra" required>
+          <option value="">Seleccionar obra...</option>
+        </select>
+
+        <div id="campoObraDestino" class="hidden">
+          <label>Obra destino</label>
+          <select id="mov-obra-destino">
+            <option value="">Seleccionar obra destino...</option>
+          </select>
+        </div>
+
+        <label>Cantidad</label>
+        <input type="number" id="mov-cantidad" min="1" max="999999" required placeholder="1 - 999,999">
+
+        <div id="stockDisponible" class="hidden" style="margin-top:6px;font-size:12px;color:#9ca3af;">
+          Stock disponible: <span id="stockDisponibleValor">—</span>
+        </div>
+
+        <div id="campoMotivo" class="hidden">
+          <label>Motivo (mínimo 10 caracteres)</label>
+          <textarea id="mov-motivo" minlength="10" placeholder="Describa el motivo del ajuste..."></textarea>
+        </div>
+
+        <label>Observación (opcional)</label>
+        <input type="text" id="mov-observacion" placeholder="Nota adicional...">
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">Registrar</button>
+          <button type="button" class="btn-cancel" id="btnCerrarMovimiento">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script type="module" src="./inventario.controller.js"></script>
+</body>
+</html>

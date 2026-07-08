@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ADDBOX — Acceso</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- CSS del login -->
+  <link rel="stylesheet" href="./assets/css/inicio-de-sesion.css">
+
+  <!-- Clerk JS -->
+  <script
+    async
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_bWVldC1kdWNrbGluZy0zNC5jbGVyay5hY2NvdW50cy5kZXYk"
+    src="https://cdn.clerk.dev/clerk.js"
+  ></script>
+</head>
+
+<body>
+
+  <div class="auth-wrapper">
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="auth-card">
+
+      <!-- LOGO -->
+      <div class="auth-logo">
+        <img src="/admin-dashboard/assets/img/logo-addbox.png" alt="ADDBOX Logo" class="auth-logo-img">
+        <p class="brand-sub">Acceso Personal</p>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="tab-content active" id="login">
+        <h2>Bienvenido de nuevo</h2>
+        <p class="subtitle">Ingresa tus credenciales</p>
+
+        <form id="loginForm">
+          <div class="input-group">
+            <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+          </div>
+
+          <div class="input-group password-group">
+            <input type="password" id="loginPassword" placeholder="Contraseña" required>
+            <span class="toggle-password" data-target="loginPassword">👁️</span>
+          </div>
+
+          <div class="forgot-password">
+            <a href="#" id="forgotPasswordLink" class="forgot-link">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button type="submit" class="btn-primary">Ingresar</button>
+        </form>
+
+        <p id="loginError" class="error"></p>
+        <div id="login-message" class="login-message"></div>
+
+        <div class="login-links">
+          <a href="/portal-autoservicio.html" class="back-link">← Volver al portal</a>
+        </div>
+
+        <!-- Clerk Sign In Component -->
+        <div id="clerk-sign-in"></div>
+      </div>
+
+    </div> <!-- auth-card -->
+
+  </div> <!-- auth-wrapper -->
+
+  <!-- Neon + Clerk Auth -->
+  <script type="module">
+    import { initClerk, getCurrentUser as getClerkUser, isAuthenticated as isClerkAuthenticated } from "./services/auth-clerk.js";
+    import { configureNeon } from "./services/neon-client.js";
+    import { login, register, getUserById, updateLastLogin, insertUsuario } from "./modules/login/login.service.js";
+    import { saveSession } from "./services/sessionService.js";
+    import { logAudit } from "./services/auditService.js";
+    import { handleError } from "./services/error-handler.js";
+    import { showToast } from "./services/toastService.js";
+
+    // =============================================
+    // CONFIGURACIÓN INICIAL
+    // =============================================
+    
+    // Configurar Neon (usar variable de entorno o localStorage)
+    const neonUrl = window.NEON_DATABASE_URL || localStorage.getItem('NEON_DATABASE_URL');
+    if (neonUrl) {
+      configureNeon(neonUrl);
+    }
+
+    // Inicializar Clerk
+    initClerk().then(() => {
+      console.log('✅ Clerk listo');
+      // Montar componente de sign in de Clerk
+      const clerkSignIn = document.getElementById('clerk-sign-in');
+      if (clerkSignIn && window.Clerk) {
+        window.Clerk.mountSignIn(clerkSignIn, {
+          routing: 'hash',
+          afterSignInUrl: '/admin-dashboard/modules/dashboard/dashboard.html'
+        });
+      }
+      // Si ya hay sesión activa, redirigir al dashboard
+      if (window.ADDBOX?.auth?.isAuthenticated()) {
+        window.location.href = "/admin-dashboard/modules/dashboard/dashboard.html";
+      }
+    }).catch((err) => {
+      console.warn('⚠️ Clerk no se pudo inicializar:', err.message);
+    });
+
+    // =============================================
+    // LOGIN FORM
+    // =============================================
+    const loginForm = document.getElementById("loginForm");
+    if (loginForm) {
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const errorEl = document.getElementById("loginError");
+        errorEl.textContent = "";
+
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+        const btn = loginForm.querySelector("button");
+        
+        if (btn) {
+          btn.dataset.originalText = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = "Ingresando...";
+        }
+
+        try {
+          const { data, error } = await login(email, password);
+
+          if (error) {
+            errorEl.textContent = "Error: " + error.message;
+            showToast("Credenciales incorrectas", "error");
+            if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText; }
+            return;
+          }
+
+          if (!data || !data.user) {
+            errorEl.textContent = "Error: no se pudo obtener el usuario.";
+            if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText; }
+            return;
+          }
+
+          // Obtener perfil
+          const perfil = await getUserById(data.user.id);
+          const clerkUser = getClerkUser();
+          const rol = perfil?.rol || clerkUser?.rol || "usuario";
+          const nombre = perfil?.nombre || clerkUser?.nombre || email.split('@')[0];
+
+          // Guardar sesión
+          sessionStorage.setItem("rol", rol);
+          sessionStorage.setItem("nombre", nombre);
+          sessionStorage.setItem("email", email);
+          sessionStorage.setItem("id", data.user.id);
+
+          saveSession({ id: data.user.id, email, rol });
+
+          await updateLastLogin(data.user.id);
+          await logAudit("Auth", "Login", `Usuario ${email} inició sesión`);
+
+          errorEl.textContent = "";
+          const msgEl = document.getElementById("login-message");
+          if (msgEl) {
+            msgEl.textContent = "✅ Acceso concedido. Redirigiendo...";
+            msgEl.className = "login-message success";
+          }
+          showToast("Bienvenido", "success");
+
+          window.location.href = "/admin-dashboard/modules/dashboard/dashboard.html";
+        } catch (err) {
+          console.error("Error en login:", err);
+          errorEl.textContent = "Error inesperado: " + err.message;
+        } finally {
+          if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText; }
+        }
+      });
+    }
+
+    // =============================================
+    // FORGOT PASSWORD
+    // =============================================
+    const forgotLink = document.getElementById("forgotPasswordLink");
+    if (forgotLink) {
+      forgotLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("loginEmail").value;
+        if (!email) {
+          handleError("login", new Error("Por favor ingresa tu correo para recuperar la contraseña."));
+          return;
+        }
+        
+        if (window.Clerk) {
+          try {
+            await window.Clerk.client.signIn.create({
+              strategy: "reset_password_email",
+              identifier: email
+            });
+            showToast("Se ha enviado un enlace de recuperación a tu correo", "success");
+          } catch (error) {
+            handleError("login", error);
+          }
+        } else {
+          handleError("login", new Error("Clerk no está disponible para recuperación de contraseña."));
+        }
+      });
+    }
+
+    // =============================================
+    // TOGGLE PASSWORD
+    // =============================================
+    document.querySelectorAll(".toggle-password").forEach((icon) => {
+      icon.addEventListener("click", () => {
+        const target = document.getElementById(icon.dataset.target);
+        if (!target) return;
+        target.type = target.type === "password" ? "text" : "password";
+      });
+    });
+
+    // =============================================
+    // CLERK SIGN IN BUTTON
+    // =============================================
+    const clerkBtn = document.getElementById("clerkSignInBtn");
+    if (clerkBtn && window.Clerk) {
+      clerkBtn.style.display = "block";
+      clerkBtn.addEventListener("click", () => {
+        window.Clerk.openSignIn();
+      });
+    }
+
+    // =============================================
+    // CHECK INSTALLATION STATUS
+    // =============================================
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('/config/addbox-install.json')
+        .then(response => response.ok ? response.json() : null)
+        .then(config => {
+          if (config && config.first_run === true) {
+            const authCard = document.querySelector('.auth-card');
+            if (authCard) {
+              const installLink = document.createElement('a');
+              installLink.href = '/admin-dashboard/instalacion.html';
+              installLink.className = 'install-link';
+              installLink.textContent = '⚙️ Configuración inicial';
+              installLink.style.cssText = `
+                display: block; text-align: center; margin-top: 1.5rem;
+                color: #666; text-decoration: none; font-size: 0.9rem;
+                transition: color 0.2s;
+              `;
+              installLink.addEventListener('mouseover', function() { installLink.style.color = '#2196F3'; });
+              installLink.addEventListener('mouseout', function() { installLink.style.color = '#666'; });
+              authCard.appendChild(installLink);
+            }
+          }
+        })
+        .catch(() => {});
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "name": "addbox-inventory-system",
+  "version": "2.0.0",
+  "description": "Sistema de Inventario ADDBOX - Migrado a Neon PostgreSQL + Clerk",
+  "type": "module",
+  "main": "index.html",
+  "scripts": {
+    "dev": "echo 'Abre el proyecto con Live Server en VS Code (Click derecho en index.html → Open with Live Server)'",
+    "start": "echo 'Usa Live Server: http://127.0.0.1:5500'",
+    "live-server": "echo 'Instala Live Server en VS Code y úsalo'",
+    "migrate": "node migrate-from-supabase.js",
+    "import-inventory": "node scripts/importar-inventario.js",
+    "verify-db": "node scripts/verificar-importacion.js",
+    "test": "echo 'Abre: http://127.0.0.1:5500/admin-dashboard/test-neon-connection.html'"
+  },
+  "keywords": [
+    "inventory",
+    "management",
+    "neon",
+    "postgresql",
+    "clerk",
+    "auth"
+  ],
+  "author": "ADDBOX LLC",
+  "license": "MIT",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "csv-parser": "^3.2.1",
+    "dotenv": "^16.6.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

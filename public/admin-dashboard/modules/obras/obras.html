@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Gestión de Obras — ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../../assets/css/toast.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .obras-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    .obra-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; transition: all 0.2s; cursor: pointer; }
+    .obra-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); border-color: rgba(0,206,201,0.3); }
+    .obra-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .obra-card-header h3 { font-size: 16px; font-weight: 700; color: #fff; margin: 0; }
+    .obra-badge { padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .obra-badge.activa { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .obra-badge.inactiva { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .obra-card-info { font-size: 13px; color: #9ca3af; margin-bottom: 12px; }
+    .obra-card-info div { margin-bottom: 4px; }
+    .obra-card-users { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .obra-user-chip { background: rgba(108,92,231,0.15); color: #a29bfe; padding: 3px 8px; border-radius: 6px; font-size: 11px; display: flex; align-items: center; gap: 4px; }
+    .obra-user-chip .remove-user { cursor: pointer; opacity: 0.6; }
+    .obra-user-chip .remove-user:hover { opacity: 1; color: #ef4444; }
+    .obra-card-actions { display: flex; gap: 8px; }
+    .obra-card-actions button { padding: 6px 12px; border-radius: 6px; border: none; font-size: 12px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    .btn-edit { background: rgba(108,92,231,0.2); color: #a29bfe; }
+    .btn-edit:hover { background: rgba(108,92,231,0.3); }
+    .btn-assign { background: rgba(0,206,201,0.2); color: #00CEC9; }
+    .btn-assign:hover { background: rgba(0,206,201,0.3); }
+    .btn-toggle { background: rgba(245,158,11,0.2); color: #f59e0b; }
+    .btn-toggle:hover { background: rgba(245,158,11,0.3); }
+    .btn-delete { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .btn-delete:hover { background: rgba(239,68,68,0.25); }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal-card { background: #1a1d23; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 24px; width: 90%; max-width: 450px; }
+    .modal-card h3 { font-size: 18px; color: #fff; margin: 0 0 16px 0; }
+    .modal-card label { display: block; font-size: 12px; color: #9ca3af; margin-bottom: 4px; margin-top: 12px; }
+    .modal-card input, .modal-card select, .modal-card textarea { width: 100%; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(0,0,0,0.3); color: #fff; font-size: 13px; }
+    .modal-card input:focus, .modal-card select:focus { border-color: #6c5ce7; outline: none; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .modal-actions .btn-save { background: #6c5ce7; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .modal-actions .btn-save:hover { background: #5a4bd6; }
+    .modal-actions .btn-cancel { background: rgba(255,255,255,0.1); color: #ddd; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+
+    .btn-crear-obra { background: #6c5ce7; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .btn-crear-obra:hover { background: #5a4bd6; }
+
+    /* Action cards */
+    .obras-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .obra-action-card { display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+    .obra-action-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.2); border-color: rgba(108,92,231,0.3); }
+    .oac-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; flex-shrink: 0; }
+    .oac-info { flex: 1; }
+    .oac-title { font-size: 14px; font-weight: 600; color: #fff; }
+    .oac-desc { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #636e72; }
+    .empty-state i { font-size: 48px; opacity: 0.3; margin-bottom: 16px; }
+    .empty-state p { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 24px;">
+        <header class="topbar">
+          <h1><i class="fa fa-building" style="color:#6c5ce7;"></i> Gestión de Obras</h1>
+          <div class="top-actions">
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- Acciones principales -->
+        <div class="obras-actions">
+          <button class="obra-action-card" id="btnCrearObra">
+            <div class="oac-icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);"><i class="fa fa-plus"></i></div>
+            <div class="oac-info">
+              <div class="oac-title">Nueva Obra</div>
+              <div class="oac-desc">Crear un nuevo proyecto o sitio</div>
+            </div>
+          </button>
+          <a href="./asignacion-masiva.html" class="obra-action-card" style="text-decoration:none;">
+            <div class="oac-icon" style="background:linear-gradient(135deg,#00CEC9,#0984E3);"><i class="fa fa-boxes-stacked"></i></div>
+            <div class="oac-info">
+              <div class="oac-title">Asignación Masiva</div>
+              <div class="oac-desc">Enviar productos a una obra por categoría</div>
+            </div>
+          </a>
+          <a href="../documentos/documentos_inventario.html" class="obra-action-card" style="text-decoration:none;">
+            <div class="oac-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444);"><i class="fa fa-file-contract"></i></div>
+            <div class="oac-info">
+              <div class="oac-title">Documentos Generados</div>
+              <div class="oac-desc">Ver órdenes de salida y traslados</div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Lista de obras -->
+        <div class="obras-grid" id="obrasGrid">
+          <div class="empty-state">
+            <i class="fa fa-building"></i>
+            <p>Cargando obras...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Crear/Editar Obra -->
+  <div class="modal-overlay" id="modalObra">
+    <div class="modal-card">
+      <h3 id="modalObraTitle">Nueva Obra</h3>
+      <form id="formObra">
+        <input type="hidden" id="obraId">
+
+        <label>Nombre de la obra</label>
+        <input type="text" id="obraNombre" required placeholder="Ej: Torre Norte, Obra Centro...">
+
+        <label>Dirección (opcional)</label>
+        <input type="text" id="obraDireccion" placeholder="Dirección física de la obra">
+
+        <label>Descripción (opcional)</label>
+        <textarea id="obraDescripcion" rows="2" placeholder="Notas adicionales..."></textarea>
+
+        <label>Estado</label>
+        <select id="obraEstado">
+          <option value="activa">Activa</option>
+          <option value="inactiva">Inactiva</option>
+        </select>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">Guardar</button>
+          <button type="button" class="btn-cancel" id="btnCerrarModalObra">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Asignar Usuarios -->
+  <div class="modal-overlay" id="modalAsignar">
+    <div class="modal-card">
+      <h3>Asignar Usuarios a: <span id="asignarObraNombre"></span></h3>
+      <input type="hidden" id="asignarObraId">
+
+      <label>Seleccionar usuario</label>
+      <select id="selectUsuarioAsignar">
+        <option value="">Seleccionar usuario...</option>
+      </select>
+
+      <div style="margin-top:12px;">
+        <button type="button" class="btn-save" id="btnConfirmarAsignar">Asignar</button>
+        <button type="button" class="btn-cancel" id="btnCerrarModalAsignar" style="margin-left:8px;">Cerrar</button>
+      </div>
+
+      <div style="margin-top:16px;">
+        <label>Usuarios asignados:</label>
+        <div id="listaAsignados" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-client.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script type="module" src="./obras.controller.js"></script>
+  <script>function logout(){window.location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

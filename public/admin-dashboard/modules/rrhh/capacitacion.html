@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Capacitación — RRHH ADDBOX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
+    .course-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 18px; }
+    .course-card h4 { font-size: 0.95rem; margin-bottom: 6px; }
+    .course-card p { font-size: 0.8rem; color: #9ca3af; }
+    .progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; }
+    .back-link { color: #8ab4ff; text-decoration: none; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <main class="content" style="padding: 24px;">
+      <a href="rrhh.html" class="back-link">← Volver a RRHH</a>
+      <h1 style="margin-top:12px;">🎓 Capacitación y Formación</h1>
+      <p style="color:#9ca3af; margin-top:8px;">Programas activos y progreso del equipo</p>
+
+      <div class="courses-grid">
+        <div class="course-card">
+          <h4>Seguridad Industrial</h4>
+          <p>12 empleados inscritos · 8 completados</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:67%; background:#22c55e;"></div></div>
+          <p style="margin-top:6px; font-size:0.75rem; color:#22c55e;">67% completado</p>
+        </div>
+        <div class="course-card">
+          <h4>Manejo de Herramientas Eléctricas</h4>
+          <p>8 empleados inscritos · 5 completados</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:62%; background:#3b82f6;"></div></div>
+          <p style="margin-top:6px; font-size:0.75rem; color:#3b82f6;">62% completado</p>
+        </div>
+        <div class="course-card">
+          <h4>Primeros Auxilios</h4>
+          <p>24 empleados inscritos · 20 completados</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:83%; background:#22c55e;"></div></div>
+          <p style="margin-top:6px; font-size:0.75rem; color:#22c55e;">83% completado</p>
+        </div>
+        <div class="course-card">
+          <h4>Uso del Sistema ADDBOX</h4>
+          <p>6 empleados inscritos · 2 completados</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:33%; background:#f97316;"></div></div>
+          <p style="margin-top:6px; font-size:0.75rem; color:#f97316;">33% completado</p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>function logout(){location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

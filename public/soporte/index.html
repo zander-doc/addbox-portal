@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>ADDBOX LLC — Centro de Soporte</title>
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/admin-dashboard/assets/css/portal-autoservicio.css" />
+  <style>
+    /* Mejoras específicas para Centro de Soporte */
+    .portal-main { max-width: 900px; margin: 0 auto; }
+    .portal-grid { gap: 24px; }
+    .portal-card { padding: 24px 20px; min-height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
+    .portal-icon { font-size: 36px; margin-bottom: 12px; }
+    .portal-btn { padding: 10px 18px; font-size: 14px; border-radius: 10px; }
+  </style>
+</head>
+<body class="portal-body">
+  <header class="portal-header">
+    <div class="portal-logo">
+      <img src="/admin-dashboard/assets/img/logo-addbox-icon.svg" alt="ADDBOX" class="portal-logo-img" />
+      <span class="logo-text">ADDBOX</span>
+    </div>
+    <div class="portal-header-right"><span class="portal-tag">Centro de Soporte</span></div>
+  </header>
+
+  <main class="portal-main">
+    <a href="/portal-autoservicio.html" style="display:inline-block;margin-bottom:16px;padding:8px 14px;border:1px solid rgba(255,255,255,0.4);border-radius:8px;color:#fff;text-decoration:none;font-size:14px;transition:all 0.2s;">← Volver al portal</a>
+
+    <section class="portal-intro">
+      <h1>🛟 Centro de Soporte</h1>
+      <p>Bienvenido al centro de soporte de ADDBOX LLC. Aquí puedes encontrar ayuda, guías y abrir tickets.</p>
+    </section>
+
+    <section class="portal-grid">
+      <article class="portal-card" onclick="window.location.href='/docs/index.html'" style="cursor:pointer;">
+        <div class="portal-icon"><span>📖</span></div>
+        <h2>Guías</h2>
+        <p>Consulta las guías de uso del sistema.</p>
+        <button class="portal-btn">Ver guías</button>
+      </article>
+
+      <article class="portal-card" onclick="window.location.href='/soporte/ticket.html'" style="cursor:pointer;">
+        <div class="portal-icon"><span>🎫</span></div>
+        <h2>Abrir Ticket</h2>
+        <p>Reporta un problema o solicita asistencia.</p>
+        <button class="portal-btn">Abrir ticket</button>
+      </article>
+
+      <article class="portal-card" onclick="window.location.href='/soporte/faq.html'" style="cursor:pointer;">
+        <div class="portal-icon"><span>❓</span></div>
+        <h2>Preguntas Frecuentes</h2>
+        <p>Respuestas a las dudas más comunes.</p>
+        <button class="portal-btn">Ver FAQ</button>
+      </article>
+
+      <article class="portal-card" onclick="window.location.href='/soporte/contacto.html'" style="cursor:pointer;">
+        <div class="portal-icon"><span>📞</span></div>
+        <h2>Contacto</h2>
+        <p>Comunícate directamente con el equipo.</p>
+        <button class="portal-btn">Ver contacto</button>
+      </article>
+    </section>
+  </main>
+
+  <footer class="portal-footer">
+    <span>© <span id="year"></span> Addbox LLC — Plataforma de gestión</span>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

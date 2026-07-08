@@ -1,0 +1,593 @@
+/* ═══════════════════════════════════════════════════
+   Alex IA — Copiloto de Inventario | Chat Widget v3.0
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Panel lateral ─── */
+.alex-panel {
+  position: fixed;
+  right: -400px;
+  top: 0;
+  width: 400px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1a1d23 0%, #12141a 100%);
+  border-left: 1px solid rgba(0,206,201,0.15);
+  box-shadow: -8px 0 30px rgba(0,0,0,0.4);
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  z-index: 99999;
+  font-family: "Inter", "Poppins", -apple-system, sans-serif;
+  opacity: 0;
+}
+
+.alex-panel.open {
+  right: 0;
+  opacity: 1;
+}
+
+/* ─── Header ─── */
+.alex-header {
+  background: #6C5CE7;
+  color: white;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(108,92,231,0.3);
+  position: relative;
+}
+
+.alex-header-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(0,206,201,0.15);
+  border: 2px solid #00CEC9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  animation: alexAvatarFloat 3s infinite ease-in-out;
+}
+
+.alex-header-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.alex-header-avatar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 8px rgba(0,206,201,0.3);
+  pointer-events: none;
+}
+
+@keyframes alexAvatarFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* Estado indicator */
+.alex-status-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00FF95;
+  border: 2px solid #6C5CE7;
+  z-index: 2;
+}
+
+.alex-status-dot.analyzing { background: #0984E3; }
+.alex-status-dot.processing { background: #6C5CE7; }
+.alex-status-dot.waiting { background: #FDCB6E; }
+.alex-status-dot.error { background: #D63031; }
+
+.alex-header-info {
+  flex: 1;
+}
+
+.alex-header-info .alex-name {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.alex-header-info .alex-subtitle {
+  font-size: 11px;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+#alexClose {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+#alexClose:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* ─── Atajos rápidos ─── */
+.alex-shortcuts {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(0,206,201,0.1);
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.03);
+}
+
+.alex-shortcut {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(0,206,201,0.4);
+  color: #dfe6e9;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.alex-shortcut:hover {
+  background: rgba(0,206,201,0.12);
+  box-shadow: 0 2px 8px rgba(0,206,201,0.2);
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+/* ─── Mensajes ─── */
+.alex-messages {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgba(0,0,0,0.15);
+}
+
+.alex-msg-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.alex-msg-wrapper.user {
+  align-items: flex-end;
+}
+
+.alex-msg-wrapper.alex {
+  align-items: flex-start;
+}
+
+.alex-msg-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Avatar mini en mensajes */
+.alex-avatar-mini {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(108,92,231,0.1);
+  border: 1.5px solid #00CEC9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  overflow: hidden;
+}
+
+.alex-avatar-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.alex-avatar-icon {
+  width: 100%;
+  height: 100%;
+  background: url('/admin-dashboard/assets/img/ALEX-IA.png') center/cover no-repeat;
+  border-radius: 50%;
+}
+
+/* Burbujas */
+.alex-msg-bubble {
+  max-width: 82%;
+  padding: 11px 15px;
+  font-size: 13px;
+  line-height: 1.55;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.alex-msg-user {
+  background: #0984E3;
+  color: white;
+  border-radius: 14px 14px 4px 14px;
+  box-shadow: 0 2px 8px rgba(9,132,227,0.3);
+}
+
+.alex-msg-bot {
+  background: rgba(255,255,255,0.06);
+  color: #e0e0e0;
+  border: 1px solid rgba(0,206,201,0.3);
+  border-radius: 14px 14px 14px 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* ─── Typing indicator ─── */
+.alex-typing {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.alex-typing-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: url('/admin-dashboard/assets/img/ALEX-IA.png') center/cover no-repeat;
+  border: 1.5px solid #00CEC9;
+  flex-shrink: 0;
+  animation: alexAvatarPulse 1.5s infinite ease-in-out;
+}
+
+.alex-typing-avatar::after {
+  display: none;
+}
+
+.alex-typing-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(0,206,201,0.3);
+  border-radius: 14px;
+  padding: 10px 14px;
+}
+
+.alex-typing-dot {
+  width: 7px;
+  height: 7px;
+  background: #00CEC9;
+  border-radius: 50%;
+  animation: alexBounce 1.4s infinite ease-in-out both;
+}
+
+.alex-typing-dot:nth-child(1) { animation-delay: 0s; }
+.alex-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.alex-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.alex-typing-label {
+  width: 100%;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+@keyframes alexBounce {
+  0%, 80%, 100% { transform: scale(0.5); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes alexAvatarPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* ─── Feedback ─── */
+.alex-feedback {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0,206,201,0.1);
+}
+
+.alex-fb-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.alex-fb-btn:hover {
+  background: rgba(0,206,201,0.15);
+  border-color: #00CEC9;
+}
+
+.alex-fb-thanks {
+  font-size: 11px;
+  color: #6C5CE7;
+  font-style: italic;
+}
+
+/* ─── Input area ─── */
+.alex-input-area {
+  display: flex;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(0,206,201,0.1);
+  background: rgba(0,0,0,0.3);
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+#alexInput {
+  flex: 1;
+  padding: 11px 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  font-size: 13px;
+  outline: none;
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#alexInput::placeholder {
+  color: #636e72;
+}
+
+#alexInput:focus {
+  border-color: #00CEC9;
+  box-shadow: 0 0 0 3px rgba(0,206,201,0.15);
+}
+
+#alexInput:disabled {
+  opacity: 0.5;
+}
+
+#alexSend {
+  padding: 11px 18px;
+  background: #6C5CE7;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+#alexSend:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(108,92,231,0.3);
+}
+
+#alexSend:active {
+  transform: scale(0.97);
+}
+
+#alexSend:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Botón flotante (FAB) ─── */
+.alex-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  background: #6C5CE7;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 0;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(108,92,231,0.4), 0 0 0 3px rgba(0,206,201,0.3);
+  z-index: 99999;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: alexFabPulse 8s infinite ease-in-out;
+  overflow: hidden;
+}
+
+/* Avatar dentro del FAB */
+.alex-button::before {
+  content: "";
+  width: 36px;
+  height: 36px;
+  background: url('/admin-dashboard/assets/img/ALEX-IA.png') center/cover no-repeat;
+  border-radius: 50%;
+  border: 2px solid rgba(0,206,201,0.5);
+  box-shadow: 0 0 10px rgba(0,206,201,0.4);
+}
+
+.alex-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px rgba(108,92,231,0.5), 0 0 0 5px rgba(0,206,201,0.4);
+}
+
+/* Ocultar FAB cuando panel abierto */
+.alex-panel.open ~ .alex-button {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+@keyframes alexFabPulse {
+  0%, 85%, 100% { box-shadow: 0 4px 16px rgba(108,92,231,0.4), 0 0 0 3px rgba(0,206,201,0.3); }
+  90% { box-shadow: 0 4px 20px rgba(108,92,231,0.6), 0 0 0 6px rgba(0,206,201,0.4); }
+}
+
+/* ─── Scrollbar ─── */
+.alex-messages::-webkit-scrollbar { width: 4px; }
+.alex-messages::-webkit-scrollbar-track { background: transparent; }
+.alex-messages::-webkit-scrollbar-thumb { background: rgba(0,206,201,0.2); border-radius: 4px; }
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .alex-panel { width: 100vw; right: -100vw; }
+}
+
+
+/* ─── Estados dinámicos (punto 7) ─── */
+.alex-panel.state-available .alex-status-dot { background: #00FF95; }
+.alex-panel.state-analyzing .alex-status-dot { background: #0984E3; animation: alexStatePulse 1s infinite; }
+.alex-panel.state-processing .alex-status-dot { background: #6C5CE7; animation: alexStatePulse 1.2s infinite; }
+.alex-panel.state-waiting .alex-status-dot { background: #FDCB6E; }
+.alex-panel.state-error .alex-status-dot { background: #D63031; }
+
+@keyframes alexStatePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* ─── Sugerencias inteligentes (punto 10) ─── */
+.alex-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  animation: alexFadeIn 0.4s ease;
+}
+
+.alex-suggestion-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(0,206,201,0.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #dfe6e9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alex-suggestion-card:hover {
+  background: rgba(0,206,201,0.1);
+  box-shadow: 0 2px 10px rgba(0,206,201,0.15);
+  transform: translateX(4px);
+  color: #fff;
+}
+
+.alex-suggestion-icon {
+  font-size: 14px;
+}
+
+@keyframes alexFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Glow al recibir respuesta ─── */
+.alex-msg-wrapper.alex.glow .alex-msg-bot {
+  animation: alexGlow 0.6s ease;
+}
+
+@keyframes alexGlow {
+  0% { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  50% { box-shadow: 0 2px 16px rgba(0,206,201,0.3); }
+  100% { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+}
+
+/* ─── Micro-giro avatar en hover ─── */
+.alex-header-avatar:hover {
+  animation: alexAvatarSpin 0.6s ease;
+}
+
+@keyframes alexAvatarSpin {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* ─── Vibración FAB al abrir ─── */
+.alex-button.vibrate {
+  animation: alexVibrate 0.3s ease;
+}
+
+@keyframes alexVibrate {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+}
+
+/* ─── Separador de fecha ─── */
+.alex-date-separator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.alex-date-separator::before,
+.alex-date-separator::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+}
+
+.alex-date-separator span {
+  font-size: 10px;
+  color: #636e72;
+  white-space: nowrap;
+}
+
+/* ─── Modo compacto responsive (punto 11) ─── */
+@media (max-width: 768px) {
+  .alex-panel { width: 100vw; right: -100vw; }
+
+  .alex-header { padding: 10px 14px; }
+  .alex-header-avatar { width: 34px; height: 34px; }
+  .alex-header-info .alex-name { font-size: 14px; }
+  .alex-header-info .alex-subtitle { font-size: 10px; }
+
+  .alex-shortcuts { padding: 8px 12px; gap: 6px; }
+  .alex-shortcut { padding: 5px 8px; font-size: 11px; }
+  .alex-shortcut span { display: none; }
+
+  .alex-avatar-mini { width: 24px; height: 24px; }
+
+  .alex-button { bottom: 16px; right: 16px; width: 52px; height: 52px; }
+  .alex-button::before { width: 30px; height: 30px; }
+
+  .alex-suggestion-card { padding: 8px 12px; font-size: 11px; }
+}

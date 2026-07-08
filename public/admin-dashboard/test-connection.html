@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADDBOX — Test de Conexión</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f0f1a;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;padding:2rem 1rem}
+.container{max-width:700px;width:100%}
+h1{font-size:1.8rem;margin-bottom:.5rem;color:#a29bfe}
+.subtitle{color:#9ca3af;margin-bottom:2rem;font-size:.95rem}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1.1rem;margin-bottom:1rem;color:#a29bfe}
+.badge{display:inline-block;padding:4px 12px;border-radius:8px;font-weight:600;font-size:.85rem}
+.badge.ok{background:rgba(34,197,94,.15);color:#22c55e}
+.badge.err{background:rgba(239,68,68,.15);color:#ef4444}
+.badge.warn{background:rgba(245,158,11,.15);color:#f59e0b}
+.badge.pending{background:rgba(108,92,231,.15);color:#a29bfe}
+.item{display:flex;justify-content:space-between;align-items:center;padding:.8rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.item:last-child{border-bottom:none}
+.label{font-size:.9rem;color:#ccc}
+.detail{background:rgba(0,0,0,.3);border-radius:8px;padding:1rem;margin-top:1rem;font-family:'Courier New',monospace;font-size:.8rem;max-height:300px;overflow-y:auto;white-space:pre-wrap;color:#9ca3af}
+button{padding:.7rem 1.5rem;background:linear-gradient(135deg,#6c5ce7,#a29bfe);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;font-size:.9rem;margin-top:1rem;transition:opacity .2s}
+button:hover{opacity:.9}
+button:disabled{opacity:.4;cursor:not-allowed}
+.actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1rem}
+.link-btn{display:inline-block;padding:.7rem 1.5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#a29bfe;text-decoration:none;font-weight:600;font-size:.9rem}
+.link-btn:hover{background:rgba(255,255,255,.12);border-color:#6c5ce7}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔌 Test de Conexión</h1>
+<p class="subtitle">Verifica el estado de Supabase y los servicios del sistema</p>
+<div class="card">
+<h2>📡 Estado de Supabase</h2>
+<div id="results">
+<div class="item"><span class="label">🌐 DNS</span><span id="s1" class="badge pending">Pendiente</span></div>
+<div class="item"><span class="label">🔗 HTTP</span><span id="s2" class="badge pending">Pendiente</span></div>
+<div class="item"><span class="label">🔐 Auth</span><span id="s3" class="badge pending">Pendiente</span></div>
+<div class="item"><span class="label">📊 API</span><span id="s4" class="badge pending">Pendiente</span></div>
+<div class="item"><span class="label">📦 productos</span><span id="s5" class="badge pending">Pendiente</span></div>
+<div class="item"><span class="label">👤 usuarios</span><span id="s6" class="badge pending">Pendiente</span></div>
+</div>
+<div id="log" class="detail">Presiona "Ejecutar Test" para comenzar...</div>
+<div class="actions">
+<button id="btnTest">▶️ Ejecutar Test</button>
+<a href="emergency-recovery.html" class="link-btn">🛠️ Recuperación</a>
+<a href="inicio-de-sesion.html" class="link-btn">🔐 Login</a>
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+<script>
+const URL="https://billwldqxupcavzurljo.supabase.co";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpbGx3bGRxeHVwY2F2enVybGpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNDAzODIsImV4cCI6MjA5MTgxNjM4Mn0.4jsINbwwL9RMjKMdnQu-nYM7qBLb9KIXhEsuXQrEGO8";
+function $(id){return document.getElementById(id)}
+function setStatus(id,cls,txt){const e=$(id);if(e){e.className='badge '+cls;e.textContent=txt}}
+function log(msg){const b=$('log');if(b){b.innerHTML+=msg+'\n';b.scrollTop=b.scrollHeight}}
+
+$('btnTest').addEventListener('click',async()=>{
+const btn=$('btnTest');btn.disabled=true;btn.textContent='⏳ Ejecutando...';
+['s1','s2','s3','s4','s5','s6'].forEach(id=>setStatus(id,'pending','...'));
+$('log').innerHTML='';log('🔄 Iniciando pruebas...\n');
+
+// DNS
+log('📡 DNS...');
+try{
+const r=await fetch('https://dns.google/resolve?name=billwldqxupcavzurljo.supabase.co&type=A');
+const d=await r.json();
+if(d&&d.Answer&&d.Answer.length>0){setStatus('s1','ok','✅ OK');log('   DNS resuelve\n')}
+else{setStatus('s1','err','❌ No resuelve');log('   ❌ Proyecto PAUSADO\n')}
+}catch(e){setStatus('s1','err','❌ Error');log('   Error: '+e.message+'\n')}
+
+// HTTP
+log('🔗 HTTP...');
+try{
+const c=new AbortController();setTimeout(()=>c.abort(),5000);
+const r=await fetch(URL+'/rest/v1/',{headers:{apikey:KEY},signal:c.signal});
+if(r.ok||r.status===401){setStatus('s2','ok','✅ HTTP '+r.status);log('   ✅ Supabase activo\n')}
+else if(r.status===503){setStatus('s2','err','❌ 503 Pausado');log('   ❌ Proyecto PAUSADO\n')}
+else{setStatus('s2','warn','⚠️ '+r.status);log('   Estado: '+r.status+'\n')}
+}catch(e){
+if(e.name==='AbortError'){setStatus('s2','err','❌ Timeout');log('   ❌ Timeout - PAUSADO\n')}
+else{setStatus('s2','err','❌ Error');log('   Error: '+e.message+'\n')}
+}
+
+// Auth
+log('🔐 Auth...');
+try{
+const sb=window.supabase.createClient(URL,KEY);
+const{error}=await sb.auth.getSession();
+if(error){setStatus('s3','warn','⚠️ '+error.message);log('   ⚠️ '+error.message+'\n')}
+else{setStatus('s3','ok','✅ OK');log('   ✅ Auth funcional\n')}
+}catch(e){setStatus('s3','err','❌ Error');log('   Error: '+e.message+'\n')}
+
+// API
+log('📊 API...');
+try{
+const sb=window.supabase.createClient(URL,KEY);
+const{error}=await sb.from('productos').select('count',{count:'exact',head:true});
+if(error){setStatus('s4','warn','⚠️ '+error.message);log('   ⚠️ '+error.message+'\n')}
+else{setStatus('s4','ok','✅ OK');log('   ✅ API OK\n')}
+}catch(e){setStatus('s4','err','❌ Error');log('   Error: '+e.message+'\n')}
+
+// Tabla productos
+log('📦 productos...');
+try{
+const sb=window.supabase.createClient(URL,KEY);
+const{count,error}=await sb.from('productos').select('*',{count:'exact',head:true});
+if(error){setStatus('s5','err','❌ '+error.message);log('   ❌ '+error.message+'\n')}
+else{setStatus('s5','ok','✅ '+count+' reg');log('   ✅ '+count+' registros\n')}
+}catch(e){setStatus('s5','err','❌ Error');log('   Error: '+e.message+'\n')}
+
+// Tabla usuarios
+log('👤 usuarios...');
+try{
+const sb=window.supabase.createClient(URL,KEY);
+const{count,error}=await sb.from('usuarios').select('*',{count:'exact',head:true});
+if(error){setStatus('s6','err','❌ '+error.message);log('   ❌ '+error.message+'\n')}
+else{setStatus('s6','ok','✅ '+count+' reg');log('   ✅ '+count+' registros\n')}
+}catch(e){setStatus('s6','err','❌ Error');log('   Error: '+e.message+'\n')}
+
+log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+if($('s1').className.includes('err')){log('⚠️ Supabase PAUSADO. Reactivar en supabase.com/dashboard\n')}
+else if($('s2').className.includes('ok')){log('✅ Supabase operativo. Usar emergency-recovery.html\n')}
+btn.disabled=false;btn.textContent='🔄 Re-ejecutar Test';
+});
+</script>
+</body>
+</html>

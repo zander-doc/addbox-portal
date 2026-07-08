@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error Handler Tests</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .test-section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .test-section h2 {
+      color: #555;
+      margin-top: 0;
+    }
+    .test-case {
+      padding: 15px;
+      margin: 10px 0;
+      border-left: 4px solid #ddd;
+      background: #fafafa;
+    }
+    .test-case.pass {
+      border-left-color: #4caf50;
+      background: #e8f5e9;
+    }
+    .test-case.fail {
+      border-left-color: #f44336;
+      background: #ffebee;
+    }
+    .test-case h3 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+    .result {
+      font-family: monospace;
+      background: #eee;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    .status {
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .status.pass {
+      background: #4caf50;
+      color: white;
+    }
+    .status.fail {
+      background: #f44336;
+      color: white;
+    }
+    .summary {
+      background: #2196f3;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .summary span {
+      font-size: 24px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>❌ Error Handler Tests</h1>
+  
+  <div class="summary" id="summary">
+    Running tests... <span id="progress">0/0</span>
+  </div>
+
+  <div id="results"></div>
+
+  <script type="module">
+    // Import the error handler
+    import { handleError } from './error-handler.js';
+
+    // Mock console.error and alert
+    const consoleErrors = [];
+    const alerts = [];
+
+    console.error = (...args) => {
+      consoleErrors.push(args.join(' '));
+    };
+
+    window.alert = (message) => {
+      alerts.push(message);
+    };
+
+    // Test cases
+    const testCases = [
+      {
+        name: "Null context handling",
+        tests: [
+          {
+            desc: "Should handle null context with default 'unknown'",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError(null, new Error("Test error"));
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Null context provided",
+                expectedContextLog: "❌ [unknown] Test error",
+                expectedAlert: "Error in unknown: Test error"
+              };
+            }
+          },
+          {
+            desc: "Should handle undefined context with default 'unknown'",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError(undefined, new Error("Test error"));
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Null context provided",
+                expectedContextLog: "❌ [unknown] Test error",
+                expectedAlert: "Error in unknown: Test error"
+              };
+            }
+          }
+        ]
+      },
+      {
+        name: "Null/Undefined error handling",
+        tests: [
+          {
+            desc: "Should handle null error with default 'Unknown error'",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError("test-context", null);
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Null error provided",
+                expectedContextLog: "❌ [test-context] Unknown error",
+                expectedAlert: "Error in test-context: Unknown error"
+              };
+            }
+          },
+          {
+            desc: "Should handle undefined error with default 'Unknown error'",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError("test-context", undefined);
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Null error provided",
+                expectedContextLog: "❌ [test-context] Unknown error",
+                expectedAlert: "Error in test-context: Unknown error"
+              };
+            }
+          }
+        ]
+      },
+      {
+        name: "Invalid context type handling",
+        tests: [
+          {
+            desc: "Should handle number context with default 'unknown'",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError(123, new Error("Test error"));
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Invalid context type: expected string",
+                expectedContextLog: "❌ [unknown] Test error",
+                expectedAlert: "Error in unknown: Test error"
+              };
+            }
+          },
+          {
+            desc: "Should handle object context with default 'unknown'",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError({ context: "test" }, new Error("Test error"));
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Invalid context type: expected string",
+                expectedContextLog: "❌ [unknown] Test error",
+                expectedAlert: "Error in unknown: Test error"
+              };
+            }
+          },
+          {
+            desc: "Should handle array context with default 'unknown'",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError(["test"], new Error("Test error"));
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Invalid context type: expected string",
+                expectedContextLog: "❌ [unknown] Test error",
+                expectedAlert: "Error in unknown: Test error"
+              };
+            }
+          }
+        ]
+      },
+      {
+        name: "Invalid error type handling",
+        tests: [
+          {
+            desc: "Should handle string error by creating new Error",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError("test-context", "String error message");
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Invalid error type: expected Error",
+                expectedContextLog: "❌ [test-context] String error message",
+                expectedAlert: "Error in test-context: String error message"
+              };
+            }
+          },
+          {
+            desc: "Should handle number error by creating new Error",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError("test-context", 404);
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [error-handler] Invalid error type: expected Error",
+                expectedContextLog: "❌ [test-context] 404",
+                expectedAlert: "Error in test-context: 404"
+              };
+            }
+          }
+        ]
+      },
+      {
+        name: "Normal operation",
+        tests: [
+          {
+            desc: "Should log and alert with correct context and error message",
+            run: () => {
+              consoleErrors.length = 0;
+              alerts.length = 0;
+              handleError("login", new Error("Authentication failed"));
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                expectedLog: "❌ [login] Authentication failed",
+                expectedAlert: "Error in login: Authentication failed"
+              };
+            }
+          },
+          {
+            desc: "Should preserve original error object",
+            run: () => {
+              const originalError = new Error("Original message");
+              handleError("test", originalError);
+              
+              return {
+                logs: consoleErrors,
+                alerts: alerts,
+                errorPreserved: originalError.message === "Original message",
+                expectedLog: "❌ [test] Original message",
+                expectedAlert: "Error in test: Original message"
+              };
+            }
+          }
+        ]
+      }
+    ];
+
+    // Run tests and display results
+    const resultsContainer = document.getElementById('results');
+    let passed = 0;
+    let failed = 0;
+    let total = 0;
+
+    testCases.forEach(section => {
+      const sectionDiv = document.createElement('div');
+      sectionDiv.className = 'test-section';
+      sectionDiv.innerHTML = `<h2>${section.name}</h2>`;
+      
+      section.tests.forEach(test => {
+        total++;
+        const testDiv = document.createElement('div');
+        testDiv.className = 'test-case';
+        
+        try {
+          const result = test.run();
+          const testPassed = 
+            result.logs.includes(result.expectedLog) &&
+            result.logs.includes(result.expectedContextLog) &&
+            result.alerts.includes(result.expectedAlert);
+          
+          if (testPassed || (result.errorPreserved !== undefined && result.errorPreserved)) {
+            testDiv.classList.add('pass');
+            passed++;
+            testDiv.innerHTML = `
+              <h3>✅ ${test.desc}</h3>
+              <div class="result">
+                <strong>Logs:</strong><br>${result.logs.map(l => `  ${l}`).join('<br>')}
+              </div>
+              <div class="result">
+                <strong>Alerts:</strong><br>${result.alerts.map(a => `  ${a}`).join('<br>')}
+              </div>
+              <span class="status pass">PASSED</span>
+            `;
+          } else {
+            testDiv.classList.add('fail');
+            failed++;
+            testDiv.innerHTML = `
+              <h3>❌ ${test.desc}</h3>
+              <div class="result">
+                <strong>Expected log:</strong> ${result.expectedLog}<br>
+                <strong>Actual logs:</strong><br>${result.logs.map(l => `  ${l}`).join('<br>')}
+              </div>
+              <div class="result">
+                <strong>Expected alert:</strong> ${result.expectedAlert}<br>
+                <strong>Actual alerts:</strong><br>${result.alerts.map(a => `  ${a}`).join('<br>')}
+              </div>
+              <span class="status fail">FAILED</span>
+            `;
+          }
+        } catch (error) {
+          testDiv.classList.add('fail');
+          failed++;
+          testDiv.innerHTML = `
+            <h3>❌ ${test.desc}</h3>
+            <div class="result">
+              <strong>Error:</strong> ${error.message}
+            </div>
+            <span class="status fail">FAILED</span>
+          `;
+        }
+        
+        sectionDiv.appendChild(testDiv);
+      });
+      
+      resultsContainer.appendChild(sectionDiv);
+    });
+
+    // Update summary
+    document.getElementById('progress').textContent = `${passed}/${total}`;
+    document.getElementById('summary').innerHTML = `
+      Tests completed: <span>${passed} passed, ${failed} failed</span>
+    `;
+  </script>
+</body>
+</html>

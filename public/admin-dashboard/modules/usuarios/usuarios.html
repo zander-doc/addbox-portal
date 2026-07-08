@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Usuarios - ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../../assets/css/toast.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .users-toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .users-toolbar input { padding:8px 12px; border:1px solid #333; border-radius:8px; background:#111; color:#fff; font-size:13px; flex:1; min-width:200px; }
+    .users-toolbar select { padding:8px 12px; border:1px solid #333; border-radius:8px; background:#111; color:#fff; font-size:13px; min-width:140px; }
+    .btn-crear { background:linear-gradient(135deg,#6c5ce7,#a29bfe); color:#fff; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; transition:0.2s; }
+    .btn-crear:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(108,92,231,0.4); }
+    .users-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .users-table th { padding:12px; text-align:left; font-size:11px; text-transform:uppercase; color:#9ca3af; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .users-table td { padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); color:#ddd; }
+    .users-table tr:hover { background:rgba(255,255,255,0.03); }
+    .badge-rol { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:600; }
+    .badge-rol.jefe { background:rgba(108,92,231,0.2); color:#a29bfe; }
+    .badge-rol.admin { background:rgba(0,210,255,0.2); color:#00d2ff; }
+    .badge-rol.almacenista { background:rgba(0,184,148,0.2); color:#00b894; }
+    .badge-rol.usuario { background:rgba(156,163,175,0.2); color:#9ca3af; }
+    .badge-estado { display:inline-block; padding:3px 10px; border-radius:6px; font-size:11px; font-weight:600; }
+    .badge-estado.activo { background:rgba(34,197,94,0.15); color:#22c55e; }
+    .badge-estado.suspendido { background:rgba(239,68,68,0.15); color:#ef4444; }
+    .btn-accion { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#ccc; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:11px; margin-right:4px; transition:0.15s; }
+    .btn-accion:hover { background:#6c5ce7; color:#fff; border-color:#6c5ce7; }
+    .btn-accion.danger:hover { background:#ef4444; border-color:#ef4444; }
+
+    /* Modal */
+    .modal-usuarios { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .modal-usuarios.show { display:flex; }
+    .modal-card { background:#1a1a2e; border-radius:14px; padding:24px; width:95%; max-width:480px; }
+    .modal-card h2 { margin:0 0 16px; font-size:18px; color:#fff; }
+    .form-group { margin-bottom:14px; }
+    .form-group label { display:block; font-size:12px; color:#9ca3af; margin-bottom:4px; }
+    .form-group input, .form-group select { width:100%; padding:10px 12px; border:1px solid #333; border-radius:8px; background:#111; color:#fff; font-size:13px; }
+    .form-group input:focus, .form-group select:focus { border-color:#6c5ce7; outline:none; }
+    .modal-actions { display:flex; gap:10px; margin-top:18px; }
+    .modal-actions button { flex:1; padding:10px; border:none; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+    .btn-guardar { background:#6c5ce7; color:#fff; }
+    .btn-guardar:hover { background:#5a4bd6; }
+    .btn-cancelar { background:#333; color:#fff; }
+    .btn-cancelar:hover { background:#444; }
+
+    .kpi-usuarios { display:flex; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
+    .kpi-u { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px 20px; flex:1; min-width:140px; }
+    .kpi-u .valor { font-size:22px; font-weight:800; color:#fff; }
+    .kpi-u .label { font-size:11px; color:#9ca3af; margin-top:2px; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap:20px;">
+
+        <header class="topbar">
+          <h1><i class="fa fa-users" style="color:#6c5ce7;"></i> Gestión de Usuarios</h1>
+          <div class="top-actions">
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- KPIs -->
+        <section class="kpi-usuarios">
+          <div class="kpi-u"><div class="valor" id="kpi-total">0</div><div class="label">Total usuarios</div></div>
+          <div class="kpi-u"><div class="valor" id="kpi-activos" style="color:#22c55e;">0</div><div class="label">Activos</div></div>
+          <div class="kpi-u"><div class="valor" id="kpi-suspendidos" style="color:#ef4444;">0</div><div class="label">Suspendidos</div></div>
+        </section>
+
+        <!-- Toolbar -->
+        <section class="users-toolbar">
+          <input type="text" id="searchInput" placeholder="Buscar por nombre o email...">
+          <select id="filtroRol">
+            <option value="">Todos los roles</option>
+            <option value="jefe">Jefe</option>
+            <option value="admin">Admin</option>
+            <option value="almacenista">Almacenista</option>
+            <option value="rrhh">RRHH</option>
+            <option value="invitado">Invitado</option>
+          </select>
+          <select id="filtroEstado">
+            <option value="">Todos los estados</option>
+            <option value="activo">Activo</option>
+            <option value="suspendido">Suspendido</option>
+          </select>
+          <button class="btn-crear" id="btnNuevo"><i class="fa fa-plus"></i> Nuevo Usuario</button>
+        </section>
+
+        <!-- Tabla -->
+        <section style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Último acceso</th>
+                <th>Registrado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" style="text-align:center;padding:20px;color:#9ca3af;">Cargando usuarios...</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Crear/Editar -->
+  <div class="modal-usuarios" id="modalUsuario">
+    <div class="modal-card">
+      <h2 id="modalTitulo">Nuevo Usuario</h2>
+      <input type="hidden" id="userId">
+      <div class="form-group"><label>Nombre completo</label><input type="text" id="userNombre" placeholder="Nombre del usuario" required></div>
+      <div class="form-group"><label>Correo electrónico</label><input type="email" id="userEmail" placeholder="email@ejemplo.com" required></div>
+      <div class="form-group"><label>Rol</label>
+        <select id="userRol">
+          <option value="jefe">Jefe</option>
+          <option value="admin">Administrador</option>
+          <option value="almacenista">Almacenista</option>
+          <option value="rrhh">Recursos Humanos</option>
+          <option value="invitado">Invitado</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Estado</label>
+        <select id="userEstado">
+          <option value="activo">Activo</option>
+          <option value="suspendido">Suspendido</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" id="btnCancelar">Cancelar</button>
+        <button class="btn-guardar" id="btnGuardar"><i class="fa fa-check"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast-container" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="./usuarios-admin.js"></script>
+  <script>function logout(){window.location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

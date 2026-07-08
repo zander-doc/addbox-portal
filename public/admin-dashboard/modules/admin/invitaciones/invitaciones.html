@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Invitaciones y accesos — Addbox</title>
+    <link rel="stylesheet" href="invitaciones.css">
+    <style>body { opacity: 0; transition: opacity 0.2s; }</style>
+</head>
+<body>
+    <div class="dashboard-center">
+        <a href="/portal-autoservicio.html" style="display:inline-block;margin-bottom:16px;padding:8px 14px;border:1px solid rgba(255,255,255,0.4);border-radius:8px;color:#fff;text-decoration:none;font-size:14px;transition:all 0.2s;">← Volver al portal</a>
+
+        <header class="ms-header">
+        <div class="ms-header-left">
+            <img src="/admin-dashboard/assets/img/logo-addbox-icon.svg" class="ms-header-icon">
+            <div>
+                <h1>Invitaciones y accesos</h1>
+                <p>Gestiona usuarios, roles y accesos autorizados.</p>
+            </div>
+        </div>
+    </header>
+
+    <section class="ms-quick-cards">
+        <div class="ms-qcard">
+            <h3>Usuarios activos</h3>
+            <p id="usuarios-activos">0</p>
+        </div>
+        <div class="ms-qcard">
+            <h3>Invitaciones pendientes</h3>
+            <p id="pendientes">0</p>
+        </div>
+        <div class="ms-qcard">
+            <h3>Invitaciones expiradas</h3>
+            <p id="expiradas">0</p>
+        </div>
+        <div class="ms-qcard">
+            <h3>Última actividad</h3>
+            <p id="ultima-actividad">—</p>
+        </div>
+    </section>
+
+    <section class="ms-card">
+        <h2>Crear nueva invitación</h2>
+        <div class="ms-form">
+            <div class="ms-field">
+                <label>Nombre completo</label>
+                <input type="text" id="nombre">
+            </div>
+            <div class="ms-field">
+                <label>Correo electrónico</label>
+                <input type="email" id="correo">
+            </div>
+            <div class="ms-field">
+                <label>Rol</label>
+                <select id="rol">
+                    <option value="admin">Administrador</option>
+                    <option value="rrhh">RRHH</option>
+                    <option value="almacenista">Almacenista</option>
+                    <option value="invitado">Invitado</option>
+                </select>
+            </div>
+            <div class="ms-field">
+                <label>Departamento</label>
+                <select id="departamento">
+                    <option value="todos">Todos (acceso completo)</option>
+                    <option value="inventario">Inventario</option>
+                    <option value="obras">Obras</option>
+                    <option value="rrhh">Recursos Humanos</option>
+                    <option value="administracion">Administración</option>
+                    <option value="soporte">Soporte</option>
+                </select>
+            </div>
+            <div class="ms-actions">
+                <button class="ms-btn-primary" onclick="crearInvitacion()">Generar invitación</button>
+                <button class="ms-btn-secondary" onclick="enviarCorreo()">Enviar por correo</button>
+                <button class="ms-btn-secondary" onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
+            </div>
+            <div id="invitacion-message" style="margin-top:12px;padding:10px 14px;border-radius:8px;font-size:14px;display:none;"></div>
+        </div>
+    </section>
+
+    <section class="ms-card">
+        <h2>Invitaciones enviadas</h2>
+        <table class="ms-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-invitaciones"></tbody>
+        </table>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+    <script src="../../../services/supabase-simple.js"></script>
+    <script type="module" src="invitaciones.js"></script>
+
+    <!-- Auth + Role Guard -->
+    <script type="module">
+      import { requireSession } from "../../../services/auth-guard.js";
+      await requireSession();
+      import { requireRole } from "../../../services/role-guard.js";
+      await requireRole(["jefe", "admin"]);
+      // Revelar contenido después de validar
+      document.body.style.opacity = "1";
+    </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+cantidad,tipo,creado_en,sitio,producto_id
+50,entrada,2024-01-15 08:30:00,Obra Central,1
+20,salida,2024-01-15 14:00:00,Obra Norte,1
+30,entrada,2024-01-16 09:00:00,Obra Central,2
+15,salida,2024-01-16 11:30:00,Obra Sur,2
+100,entrada,2024-01-17 07:45:00,Obra Este,3
+25,salida,2024-01-17 15:20:00,Obra Oeste,3
+40,entrada,2024-01-18 10:00:00,Obra Central,4
+35,salida,2024-01-18 16:45:00,Obra Norte,4
+15,entrada,2024-01-19 08:15:00,Obra Sur,5
+10,salida,2024-01-19 13:30:00,Obra Central,5

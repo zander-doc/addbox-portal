@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Configuración — ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .cfg-tabs { display:flex; gap:4px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:4px; margin-bottom:24px; flex-wrap:wrap; }
+    .cfg-tab { padding:10px 18px; border-radius:9px; font-size:13px; font-weight:600; color:#9ca3af; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px; border:none; background:transparent; }
+    .cfg-tab:hover { color:#fff; background:rgba(255,255,255,0.05); }
+    .cfg-tab.active { background:linear-gradient(135deg,#6c5ce7,#a29bfe); color:#fff; box-shadow:0 4px 12px rgba(108,92,231,0.3); }
+    .cfg-tab i { font-size:12px; }
+    .cfg-panel { display:none; }
+    .cfg-panel.active { display:block; }
+    .cfg-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:24px; margin-bottom:16px; }
+    .cfg-card-title { font-size:14px; font-weight:700; color:#fff; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+    .cfg-card-title i { color:#6c5ce7; }
+    .cfg-field { margin-bottom:16px; }
+    .cfg-label { font-size:12px; color:#9ca3af; margin-bottom:6px; display:block; }
+    .cfg-input { width:100%; padding:10px 14px; border:1px solid rgba(255,255,255,0.12); border-radius:10px; background:rgba(255,255,255,0.04); color:#fff; font-size:14px; transition:all 0.2s; }
+    .cfg-input:focus { outline:none; border-color:#6c5ce7; box-shadow:0 0 0 3px rgba(108,92,231,0.15); }
+    .cfg-input-sm { max-width:200px; }
+    .cfg-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .cfg-toggle { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .cfg-toggle-label { font-size:13px; color:#ddd; }
+    .cfg-toggle-desc { font-size:11px; color:#9ca3af; margin-top:2px; }
+    .switch { position:relative; width:44px; height:24px; flex-shrink:0; }
+    .switch input { opacity:0; width:0; height:0; }
+    .switch .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.1); border-radius:24px; transition:0.3s; }
+    .switch .slider::before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+    .switch input:checked + .slider { background:#6c5ce7; }
+    .switch input:checked + .slider::before { transform:translateX(20px); }
+    .cfg-btn { padding:10px 20px; border:none; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s; }
+    .cfg-btn-primary { background:linear-gradient(135deg,#6c5ce7,#a29bfe); color:#fff; }
+    .cfg-btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(108,92,231,0.4); }
+    .cfg-btn-ghost { background:rgba(255,255,255,0.05); color:#9ca3af; border:1px solid rgba(255,255,255,0.1); }
+    .cfg-btn-ghost:hover { background:rgba(255,255,255,0.08); color:#fff; }
+    .cfg-status { font-size:12px; padding:4px 10px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; }
+    .cfg-status.online { background:rgba(34,197,94,0.1); color:#22c55e; }
+    .cfg-status.offline { background:rgba(239,68,68,0.1); color:#ef4444; }
+    @media (max-width:768px) { .cfg-row { grid-template-columns:1fr; } .cfg-tabs { flex-wrap:wrap; } }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap:24px;">
+
+        <header class="topbar">
+          <h1><i class="fa fa-gear" style="color:#6c5ce7;"></i> Configuración</h1>
+          <div class="top-actions">
+            <button class="cfg-btn cfg-btn-primary" id="btnGuardar"><i class="fa fa-floppy-disk"></i> Guardar cambios</button>
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- Tabs -->
+        <nav class="cfg-tabs">
+          <button class="cfg-tab active" data-tab="empresa"><i class="fa fa-building"></i> Empresa</button>
+          <button class="cfg-tab" data-tab="inventario"><i class="fa fa-boxes-stacked"></i> Inventario</button>
+          <button class="cfg-tab" data-tab="notificaciones"><i class="fa fa-bell"></i> Notificaciones</button>
+          <button class="cfg-tab" data-tab="seguridad"><i class="fa fa-lock"></i> Seguridad</button>
+          <button class="cfg-tab" data-tab="alex"><i class="fa fa-robot"></i> Alex IA</button>
+        </nav>
+        <!-- TAB: EMPRESA -->
+        <div class="cfg-panel active" id="panel-empresa">
+          <div class="cfg-card">
+            <div class="cfg-card-title"><i class="fa fa-building"></i> Datos de la Empresa</div>
+            <div class="cfg-row">
+              <div class="cfg-field">
+                <label class="cfg-label">Nombre de la empresa</label>
+                <input class="cfg-input" id="cfgEmpresaNombre" placeholder="Ej: Constructora ABC">
+              </div>
+              <div class="cfg-field">
+                <label class="cfg-label">RIF / NIT</label>
+                <input class="cfg-input" id="cfgEmpresaRif" placeholder="Ej: J-12345678-9">
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-field">
+                <label class="cfg-label">Teléfono</label>
+                <input class="cfg-input" id="cfgEmpresaTelefono" placeholder="Ej: +58 412-1234567">
+              </div>
+              <div class="cfg-field">
+                <label class="cfg-label">Email de contacto</label>
+                <input class="cfg-input" id="cfgEmpresaEmail" placeholder="Ej: admin@empresa.com">
+              </div>
+            </div>
+            <div class="cfg-row">
+              <div class="cfg-field">
+                <label class="cfg-label">Moneda del sistema</label>
+                <select class="cfg-input cfg-input-sm" id="cfgMoneda">
+                  <option value="USD">USD ($)</option>
+                  <option value="BS">Bolívares (Bs)</option>
+                  <option value="COP">Pesos (COP)</option>
+                  <option value="EUR">Euros (€)</option>
+                </select>
+              </div>
+              <div class="cfg-field">
+                <label class="cfg-label">Logo (URL)</label>
+                <input class="cfg-input" id="cfgLogo" placeholder="https://...">
+              </div>
+            </div>
+            <div class="cfg-field">
+              <label class="cfg-label">Dirección</label>
+              <input class="cfg-input" id="cfgEmpresaDireccion" placeholder="Dirección fiscal">
+            </div>
+          </div>
+
+          <!-- Documento RIF -->
+          <div class="cfg-card">
+            <div class="cfg-card-title"><i class="fa fa-file-pdf"></i> Documento RIF</div>
+
+            <!-- Estado: sin documento -->
+            <div id="rifEmpty">
+              <p style="font-size:12px;color:#9ca3af;margin:0 0 12px;">Sube el documento RIF de la empresa (PDF o imagen).</p>
+              <label class="cfg-btn cfg-btn-primary" style="cursor:pointer;">
+                <i class="fa fa-upload"></i> Subir RIF
+                <input type="file" id="inputRifFile" accept=".pdf,.jpg,.jpeg,.png" style="display:none;">
+              </label>
+            </div>
+
+            <!-- Estado: documento cargado (info + acciones) -->
+            <div id="rifLoaded" style="display:none;">
+              <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;display:flex;align-items:center;gap:16px;">
+                <div style="width:48px;height:48px;border-radius:10px;background:rgba(108,92,231,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i class="fa fa-file-pdf" style="font-size:22px;color:#a29bfe;" id="rifIcon"></i>
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="rifFileName">documento.pdf</div>
+                  <div style="font-size:11px;color:#9ca3af;margin-top:2px;" id="rifFileMeta">PDF • Subido</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-shrink:0;">
+                  <button class="cfg-btn cfg-btn-ghost" id="btnVerRif" title="Ver documento" style="padding:8px 12px;"><i class="fa fa-eye"></i></button>
+                  <button class="cfg-btn cfg-btn-ghost" id="btnDescargarRif" title="Descargar" style="padding:8px 12px;"><i class="fa fa-download"></i></button>
+                  <label class="cfg-btn cfg-btn-ghost" title="Sustituir" style="padding:8px 12px;cursor:pointer;">
+                    <i class="fa fa-arrows-rotate"></i>
+                    <input type="file" id="inputRifReplace" accept=".pdf,.jpg,.jpeg,.png" style="display:none;">
+                  </label>
+                  <button class="cfg-btn cfg-btn-ghost" id="btnEliminarRif" title="Eliminar" style="padding:8px 12px;color:#ef4444;"><i class="fa fa-trash"></i></button>
+                </div>
+              </div>
+
+              <!-- Preview inline -->
+              <div id="rifPreview" style="display:none;margin-top:14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;max-height:400px;">
+                <div id="rifPreviewContent" style="width:100%;max-height:400px;overflow:auto;display:flex;align-items:center;justify-content:center;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: INVENTARIO -->
+        <div class="cfg-panel" id="panel-inventario">
+          <div class="cfg-card">
+            <div class="cfg-card-title"><i class="fa fa-boxes-stacked"></i> Parámetros de Inventario</div>
+            <div class="cfg-row">
+              <div class="cfg-field">
+                <label class="cfg-label">Stock mínimo por defecto</label>
+                <input class="cfg-input cfg-input-sm" type="number" id="cfgStockMinimo" value="5" min="0">
+              </div>
+              <div class="cfg-field">
+                <label class="cfg-label">Unidad de medida por defecto</label>
+                <select class="cfg-input cfg-input-sm" id="cfgUnidadDefecto">
+                  <option value="uds">Unidades (uds)</option>
+                  <option value="kg">Kilogramos (kg)</option>
+                  <option value="m">Metros (m)</option>
+                  <option value="lt">Litros (lt)</option>
+                  <option value="gl">Galones (gl)</option>
+                </select>
+              </div>
+            </div>
+            <div class="cfg-field">
+              <label class="cfg-label">Días para considerar devolución vencida</label>
+              <input class="cfg-input cfg-input-sm" type="number" id="cfgDiasDevolucion" value="7" min="1">
+            </div>
+          </div>
+          <div class="cfg-card">
+            <div class="cfg-card-title"><i class="fa fa-sliders"></i> Reglas de Negocio</div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Permitir stock negativo</div>
+                <div class="cfg-toggle-desc">Si se desactiva, no se podrán registrar salidas que dejen el stock por debajo de 0</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgStockNegativo"><span class="slider"></span></label>
+            </div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Motivo obligatorio en salidas</div>
+                <div class="cfg-toggle-desc">Requiere que el usuario indique un motivo al registrar una salida de material</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgMotivoSalida" checked><span class="slider"></span></label>
+            </div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Aprobación de transferencias</div>
+                <div class="cfg-toggle-desc">Las transferencias entre obras requieren aprobación del supervisor</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgAprobTransferencia"><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+        <!-- TAB: NOTIFICACIONES -->
+        <div class="cfg-panel" id="panel-notificaciones">
+          <div class="cfg-card">
+            <div class="cfg-card-title"><i class="fa fa-bell"></i> Alertas y Notificaciones</div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Alertas de stock crítico</div>
+                <div class="cfg-toggle-desc">Notificar cuando un producto baje del stock mínimo</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgAlertaStock" checked><span class="slider"></span></label>
+            </div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Alertas de devoluciones vencidas</div>
+                <div class="cfg-toggle-desc">Notificar cuando un material prestado supere los días límite</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgAlertaDevolucion" checked><span class="slider"></span></label>
+            </div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Resumen diario por email</div>
+                <div class="cfg-toggle-desc">Enviar un resumen de movimientos del día al email configurado</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgResumenDiario"><span class="slider"></span></label>
+            </div>
+          </div>
+          <div class="cfg-card">
+            <div class="cfg-card-title"><i class="fa fa-envelope"></i> Destinatarios</div>
+            <div class="cfg-field">
+              <label class="cfg-label">Email para notificaciones</label>
+              <input class="cfg-input" id="cfgEmailNotif" placeholder="admin@empresa.com">
+            </div>
+          </div>
+        </div>
+        <!-- TAB: SEGURIDAD -->
+        <div class="cfg-panel" id="panel-seguridad">
+          <div class="cfg-card">
+            <div class="cfg-card-title"><i class="fa fa-lock"></i> Sesiones y Acceso</div>
+            <div class="cfg-row">
+              <div class="cfg-field">
+                <label class="cfg-label">Tiempo de expiración de sesión (minutos)</label>
+                <input class="cfg-input cfg-input-sm" type="number" id="cfgSesionExpira" value="60" min="5">
+              </div>
+              <div class="cfg-field">
+                <label class="cfg-label">Días de vigencia de invitaciones</label>
+                <input class="cfg-input cfg-input-sm" type="number" id="cfgInvitacionDias" value="7" min="1">
+              </div>
+            </div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Permitir múltiples sesiones</div>
+                <div class="cfg-toggle-desc">Un usuario puede estar logueado en varios dispositivos a la vez</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgMultiSesion" checked><span class="slider"></span></label>
+            </div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Registro de actividad (auditoría)</div>
+                <div class="cfg-toggle-desc">Guardar log de todas las acciones de los usuarios</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgAuditoria" checked><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+        <!-- TAB: ALEX IA -->
+        <div class="cfg-panel" id="panel-alex">
+          <div class="cfg-card">
+            <div class="cfg-card-title"><i class="fa fa-robot"></i> Alex IA — Copiloto de Inventario</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+              <span class="cfg-status" id="alexStatus">
+                <i class="fa fa-circle" style="font-size:8px;"></i> Verificando...
+              </span>
+            </div>
+            <div class="cfg-toggle">
+              <div>
+                <div class="cfg-toggle-label">Activar Alex IA</div>
+                <div class="cfg-toggle-desc">Muestra el botón de Alex en todos los módulos del dashboard</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="cfgAlexActivo" checked><span class="slider"></span></label>
+            </div>
+            <div class="cfg-field" style="margin-top:16px;">
+              <label class="cfg-label">URL del servidor de Alex</label>
+              <input class="cfg-input" id="cfgAlexUrl" value="http://localhost:3100">
+            </div>
+            <div class="cfg-field">
+              <label class="cfg-label">Modelo de IA</label>
+              <select class="cfg-input cfg-input-sm" id="cfgAlexModelo">
+                <option value="gpt-4o-mini">gpt-4o-mini (económico)</option>
+                <option value="gpt-4o">gpt-4o (potente)</option>
+                <option value="gpt-3.5-turbo">gpt-3.5-turbo (rápido)</option>
+              </select>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="cfg-btn cfg-btn-ghost" id="btnTestAlex"><i class="fa fa-plug"></i> Probar conexión</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script>
+    function logout() { window.location.href = "../../inicio-de-sesion.html"; }
+
+    // --- Tabs ------------------------------------------------------------------
+    document.querySelectorAll(".cfg-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".cfg-tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".cfg-panel").forEach(p => p.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(`panel-${tab.dataset.tab}`).classList.add("active");
+      });
+    });
+
+    // --- Cargar configuración guardada -----------------------------------------
+    const CONFIG_KEY = "addbox_config";
+
+    function cargarConfig() {
+      const saved = localStorage.getItem(CONFIG_KEY);
+      if (!saved) return;
+      try {
+        const cfg = JSON.parse(saved);
+        // Empresa
+        if (cfg.empresaNombre) document.getElementById("cfgEmpresaNombre").value = cfg.empresaNombre;
+        if (cfg.empresaRif) document.getElementById("cfgEmpresaRif").value = cfg.empresaRif;
+        if (cfg.empresaTelefono) document.getElementById("cfgEmpresaTelefono").value = cfg.empresaTelefono;
+        if (cfg.empresaEmail) document.getElementById("cfgEmpresaEmail").value = cfg.empresaEmail;
+        if (cfg.empresaDireccion) document.getElementById("cfgEmpresaDireccion").value = cfg.empresaDireccion;
+        if (cfg.moneda) document.getElementById("cfgMoneda").value = cfg.moneda;
+        if (cfg.logo) document.getElementById("cfgLogo").value = cfg.logo;
+        // Inventario
+        if (cfg.stockMinimo != null) document.getElementById("cfgStockMinimo").value = cfg.stockMinimo;
+        if (cfg.unidadDefecto) document.getElementById("cfgUnidadDefecto").value = cfg.unidadDefecto;
+        if (cfg.diasDevolucion != null) document.getElementById("cfgDiasDevolucion").value = cfg.diasDevolucion;
+        if (cfg.stockNegativo != null) document.getElementById("cfgStockNegativo").checked = cfg.stockNegativo;
+        if (cfg.motivoSalida != null) document.getElementById("cfgMotivoSalida").checked = cfg.motivoSalida;
+        if (cfg.aprobTransferencia != null) document.getElementById("cfgAprobTransferencia").checked = cfg.aprobTransferencia;
+        // Notificaciones
+        if (cfg.alertaStock != null) document.getElementById("cfgAlertaStock").checked = cfg.alertaStock;
+        if (cfg.alertaDevolucion != null) document.getElementById("cfgAlertaDevolucion").checked = cfg.alertaDevolucion;
+        if (cfg.resumenDiario != null) document.getElementById("cfgResumenDiario").checked = cfg.resumenDiario;
+        if (cfg.emailNotif) document.getElementById("cfgEmailNotif").value = cfg.emailNotif;
+        // Seguridad
+        if (cfg.sesionExpira != null) document.getElementById("cfgSesionExpira").value = cfg.sesionExpira;
+        if (cfg.invitacionDias != null) document.getElementById("cfgInvitacionDias").value = cfg.invitacionDias;
+        if (cfg.multiSesion != null) document.getElementById("cfgMultiSesion").checked = cfg.multiSesion;
+        if (cfg.auditoria != null) document.getElementById("cfgAuditoria").checked = cfg.auditoria;
+        // Alex
+        if (cfg.alexActivo != null) document.getElementById("cfgAlexActivo").checked = cfg.alexActivo;
+        if (cfg.alexUrl) document.getElementById("cfgAlexUrl").value = cfg.alexUrl;
+        if (cfg.alexModelo) document.getElementById("cfgAlexModelo").value = cfg.alexModelo;
+      } catch(e) { console.warn("Error cargando config:", e); }
+    }
+    // --- Guardar configuración -------------------------------------------------
+    function guardarConfig() {
+      const cfg = {
+        empresaNombre: document.getElementById("cfgEmpresaNombre").value,
+        empresaRif: document.getElementById("cfgEmpresaRif").value,
+        empresaTelefono: document.getElementById("cfgEmpresaTelefono").value,
+        empresaEmail: document.getElementById("cfgEmpresaEmail").value,
+        empresaDireccion: document.getElementById("cfgEmpresaDireccion").value,
+        moneda: document.getElementById("cfgMoneda").value,
+        logo: document.getElementById("cfgLogo").value,
+        stockMinimo: parseInt(document.getElementById("cfgStockMinimo").value) || 5,
+        unidadDefecto: document.getElementById("cfgUnidadDefecto").value,
+        diasDevolucion: parseInt(document.getElementById("cfgDiasDevolucion").value) || 7,
+        stockNegativo: document.getElementById("cfgStockNegativo").checked,
+        motivoSalida: document.getElementById("cfgMotivoSalida").checked,
+        aprobTransferencia: document.getElementById("cfgAprobTransferencia").checked,
+        alertaStock: document.getElementById("cfgAlertaStock").checked,
+        alertaDevolucion: document.getElementById("cfgAlertaDevolucion").checked,
+        resumenDiario: document.getElementById("cfgResumenDiario").checked,
+        emailNotif: document.getElementById("cfgEmailNotif").value,
+        sesionExpira: parseInt(document.getElementById("cfgSesionExpira").value) || 60,
+        invitacionDias: parseInt(document.getElementById("cfgInvitacionDias").value) || 7,
+        multiSesion: document.getElementById("cfgMultiSesion").checked,
+        auditoria: document.getElementById("cfgAuditoria").checked,
+        alexActivo: document.getElementById("cfgAlexActivo").checked,
+        alexUrl: document.getElementById("cfgAlexUrl").value,
+        alexModelo: document.getElementById("cfgAlexModelo").value,
+      };
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+      alert("? Configuración guardada correctamente.");
+    }
+
+    // --- Test Alex IA ----------------------------------------------------------
+    async function testAlex() {
+      const url = document.getElementById("cfgAlexUrl").value;
+      const status = document.getElementById("alexStatus");
+      status.className = "cfg-status";
+      status.innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:10px;"></i> Verificando...';
+
+      try {
+        const res = await fetch(url + "/api/health", { signal: AbortSignal.timeout(5000) });
+        if (res.ok) {
+          const data = await res.json();
+          status.className = "cfg-status online";
+          status.innerHTML = '<i class="fa fa-circle" style="font-size:8px;"></i> Online — ' + (data.agent || "Alex IA");
+        } else {
+          status.className = "cfg-status offline";
+          status.innerHTML = '<i class="fa fa-circle" style="font-size:8px;"></i> Error: ' + res.status;
+        }
+      } catch(e) {
+        status.className = "cfg-status offline";
+        status.innerHTML = '<i class="fa fa-circle" style="font-size:8px;"></i> Offline — No se pudo conectar';
+      }
+    }
+
+    // --- Init ------------------------------------------------------------------
+    document.getElementById("btnGuardar").addEventListener("click", guardarConfig);
+    document.getElementById("btnTestAlex").addEventListener("click", testAlex);
+
+    // RIF upload/download/replace/delete
+    document.getElementById("inputRifFile").addEventListener("change", (e) => subirRif(e.target.files[0]));
+    document.getElementById("inputRifReplace").addEventListener("change", (e) => subirRif(e.target.files[0]));
+    document.getElementById("btnDescargarRif").addEventListener("click", descargarRif);
+    document.getElementById("btnVerRif").addEventListener("click", verRif);
+    document.getElementById("btnEliminarRif").addEventListener("click", eliminarRif);
+
+    function subirRif(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const data = { name: file.name, type: file.type, size: file.size, content: ev.target.result, fecha: new Date().toLocaleDateString("es-ES") };
+        localStorage.setItem("addbox_rif_doc", JSON.stringify(data));
+        mostrarRifCargado(data);
+        alert("? Documento RIF subido correctamente.");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function descargarRif() {
+      const saved = localStorage.getItem("addbox_rif_doc");
+      if (!saved) return;
+      const data = JSON.parse(saved);
+      const link = document.createElement("a");
+      link.href = data.content;
+      link.download = data.name;
+      link.click();
+    }
+
+    function verRif() {
+      const saved = localStorage.getItem("addbox_rif_doc");
+      if (!saved) return;
+      const data = JSON.parse(saved);
+      const preview = document.getElementById("rifPreview");
+      const content = document.getElementById("rifPreviewContent");
+
+      // Toggle: si ya está visible, ocultarlo
+      if (preview.style.display === "block") {
+        preview.style.display = "none";
+        return;
+      }
+
+      if (data.type === "application/pdf") {
+        content.innerHTML = '<iframe src="' + data.content + '" style="width:100%;height:380px;border:none;border-radius:8px;"></iframe>';
+      } else {
+        content.innerHTML = '<img src="' + data.content + '" style="max-width:100%;max-height:380px;border-radius:8px;object-fit:contain;padding:12px;">';
+      }
+      preview.style.display = "block";
+    }
+
+    function eliminarRif() {
+      if (!confirm("¿Eliminar el documento RIF?")) return;
+      localStorage.removeItem("addbox_rif_doc");
+      document.getElementById("rifEmpty").style.display = "block";
+      document.getElementById("rifLoaded").style.display = "none";
+    }
+
+    function mostrarRifCargado(data) {
+      document.getElementById("rifEmpty").style.display = "none";
+      document.getElementById("rifLoaded").style.display = "block";
+      document.getElementById("rifFileName").textContent = data.name;
+      const ext = data.name.split(".").pop().toUpperCase();
+      document.getElementById("rifFileMeta").textContent = ext + " • Subido " + (data.fecha || "");
+      const icon = document.getElementById("rifIcon");
+      if (data.type && data.type.startsWith("image")) {
+        icon.className = "fa fa-file-image";
+      } else {
+        icon.className = "fa fa-file-pdf";
+      }
+    }
+
+    // Verificar si ya hay RIF guardado
+    (function() {
+      const saved = localStorage.getItem("addbox_rif_doc");
+      if (saved) {
+        try { mostrarRifCargado(JSON.parse(saved)); } catch(e) {}
+      }
+    })();
+
+    cargarConfig();
+    testAlex();
+  </script>
+</body>
+</html>

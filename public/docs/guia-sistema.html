@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Guía del Sistema — ADDBOX LLC</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+font-family: 'Inter', 'Segoe UI', sans-serif;
+background: #f0f2f5;
+color: #1a1a2e;
+line-height: 1.7;
+}
+.container {
+max-width: 960px;
+margin: 0 auto;
+padding: 40px 24px;
+}
+h1 {
+text-align: center;
+font-size: 2rem;
+margin-bottom: 8px;
+}
+p.subtitle {
+text-align: center;
+color: #666;
+margin-bottom: 32px;
+}
+.section {
+background: #fff;
+border-radius: 16px;
+padding: 28px;
+margin-bottom: 28px;
+box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+border-left: 5px solid #6c5ce7;
+}
+.section h2 {
+font-size: 1.3rem;
+margin-bottom: 8px;
+}
+.section small {
+display: block;
+color: #888;
+margin-bottom: 12px;
+font-size: 0.8rem;
+}
+.code-block {
+background: #1a1a2e;
+color: #00d2ff;
+padding: 12px;
+border-radius: 6px;
+font-family: monospace;
+font-size: 0.8rem;
+margin: 10px 0;
+overflow-x: auto;
+}
+ul, ol {
+margin-top: 8px;
+padding-left: 20px;
+color: #444;
+font-size: 0.9rem;
+}
+li { margin-bottom: 4px; }
+</style>
+<style>
+.folder {
+font-family: monospace;
+color: #6c5ce7;
+}
+.footer {
+text-align: center;
+padding: 24px;
+color: #999;
+font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📙 Guía del Sistema</h1>
+<p class="subtitle">Arquitectura interna, rutas, módulos y estructura oficial de ADDBOX PRO</p>
+
+<!-- SECCIÓN 1 -->
+<div class="section">
+<h2>1. Estructura de carpetas</h2>
+<small>Distribución oficial del frontend</small>
+<p>La estructura base del proyecto es la siguiente:</p>
+<div class="code-block">/public<br>├── portal-autoservicio.html<br>├── soporte/<br>│   ├── index.html<br>│   ├── ticket.html<br>│   ├── faq.html<br>│   └── contacto.html<br>├── docs/<br>│   ├── index.html<br>│   ├── guia-crear-jefe.html<br>│   ├── guia-desarrollador.html<br>│   ├── guia-sistema.html<br>│   └── guia-agente-ia.html<br>└── admin-dashboard/<br>    ├── inicio-de-sesion.html<br>    ├── crear-jefe.html<br>    ├── setup/<br>    │   └── dev-master-key.html<br>    ├── assets/<br>    │   ├── css/<br>    │   ├── js/<br>    │   └── img/<br>    ├── components/<br>    │   ├── sidebar.html<br>    │   └── header.html<br>    └── modules/<br>        ├── dashboard/<br>        ├── usuarios/<br>        ├── inventario/<br>        ├── movimientos/<br>        ├── reportes/<br>        └── ...</div>
+</div>
+<!-- SECCIÓN 2 -->
+<div class="section">
+<h2>2. Rutas absolutas</h2>
+<small>Estándar oficial de navegación</small>
+<p>ADDBOX PRO usa rutas absolutas para evitar errores de navegación:</p>
+<ul>
+<li><code>/admin-dashboard/modules/dashboard/dashboard.html</code></li>
+<li><code>/admin-dashboard/modules/usuarios/usuarios.html</code></li>
+<li><code>/admin-dashboard/modules/inventario/productos.html</code></li>
+<li><code>/admin-dashboard/inicio-de-sesion.html</code></li>
+</ul>
+<p>Regla general:</p>
+<div class="code-block">/admin-dashboard/... (siempre absoluto)</div>
+</div>
+
+<!-- SECCIÓN 3 -->
+<div class="section">
+<h2>3. Módulos del sistema</h2>
+<small>Organización por áreas funcionales</small>
+<p>Los módulos están organizados por carpetas dentro de <code>/admin-dashboard/modules/</code>:</p>
+<ul>
+<li><strong>dashboard/</strong> — panel principal del jefe</li>
+<li><strong>usuarios/</strong> — gestión de usuarios internos</li>
+<li><strong>inventario/</strong> — productos, stock, movimientos</li>
+<li><strong>movimientos/</strong> — entradas y salidas</li>
+<li><strong>reportes/</strong> — informes y estadísticas</li>
+</ul>
+</div>
+
+<!-- SECCIÓN 4 -->
+<div class="section">
+<h2>4. Componentes reutilizables</h2>
+<small>Elementos compartidos en todo el sistema</small>
+<p>Los componentes se encuentran en <code>/admin-dashboard/components/</code>:</p>
+<ul>
+<li><strong>sidebar.html</strong> — menú lateral</li>
+<li><strong>header.html</strong> — encabezado superior</li>
+</ul>
+<p>Estos componentes se cargan dinámicamente mediante JavaScript.</p>
+</div>
+
+<!-- SECCIÓN 5 -->
+<div class="section">
+<h2>5. Servicios internos</h2>
+<small>Funciones JS que manejan lógica del sistema</small>
+<p>Los servicios están en <code>/admin-dashboard/assets/js/</code>:</p>
+<ul>
+<li><strong>auth.js</strong> — login, logout, validación de sesión</li>
+<li><strong>supabase.js</strong> — conexión y consultas</li>
+<li><strong>utils.js</strong> — funciones auxiliares</li>
+<li><strong>router.js</strong> — carga de módulos y navegación</li>
+</ul>
+</div>
+<!-- SECCIÓN 6 -->
+<div class="section">
+<h2>6. Estándares de CSS</h2>
+<small>Reglas para mantener consistencia visual</small>
+<ul>
+<li>Siempre usar <code>/admin-dashboard/assets/css/</code> como ruta base.</li>
+<li>Evitar rutas relativas como <code>../../css</code> salvo en casos controlados.</li>
+<li>Usar clases con prefijo <code>app-</code> para elementos globales.</li>
+<li>Evitar estilos inline salvo en mockups o documentación.</li>
+</ul>
+</div>
+
+<!-- SECCIÓN 7 -->
+<div class="section">
+<h2>7. Estándares de JavaScript</h2>
+<small>Buenas prácticas internas</small>
+<ul>
+<li>Usar <code>async/await</code> para todas las operaciones con Supabase.</li>
+<li>No mezclar lógica de UI con lógica de datos.</li>
+<li>Centralizar errores en <code>utils.js</code>.</li>
+<li>Usar nombres descriptivos para funciones y variables.</li>
+</ul>
+</div>
+
+<!-- SECCIÓN 8 -->
+<div class="section">
+<h2>8. Navegación interna</h2>
+<small>Cómo se mueve el usuario dentro del sistema</small>
+<p>La navegación se basa en:</p>
+<ul>
+<li>Sidebar (component)</li>
+<li>Rutas absolutas</li>
+<li>Validación de sesión</li>
+<li>Validación de rol</li>
+</ul>
+</div>
+
+<div class="footer">
+© ADDBOX LLC — Guía del Sistema · Arquitectura interna<br>
+Versión 1.0 · Generado el 19 de mayo de 2026
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Partidas - ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 30px;">
+        <header class="topbar">
+          <h1>Partidas de Obra</h1>
+          <div class="top-actions">
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+        <section class="historial">
+          <h2 style="font-size: 24px;">Partidas</h2>
+          <table class="dashboard-table">
+            <thead><tr><th>Nombre</th><th>Descripción</th><th>Monto</th><th>Estado</th><th>Fecha</th></tr></thead>
+            <tbody id="partidas-tbody"><tr><td colspan="5">Cargando...</td></tr></tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script type="module" src="./partidas.controller.js"></script>
+  <script>function logout(){window.location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

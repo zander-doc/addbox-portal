@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Operaciones por Lote - ADDBOX Inventory</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Lote-specific styles */
+    .lote-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .lote-actions .btn-import { background:#2d2d44; border:1px solid #444; color:#fff; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s; }
+    .lote-actions .btn-import:hover { background:#3d3d5c; border-color:#6c5ce7; }
+    .lote-actions .btn-add-line { background:#6c5ce7; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s; }
+    .lote-actions .btn-add-line:hover { background:#5a4bd6; }
+
+    /* CSV file input hidden */
+    .csv-input-hidden { display:none; }
+
+    /* Summary bar */
+    .lote-summary { display:flex; align-items:center; gap:20px; padding:12px 16px; background:#1a1a2e; border-radius:10px; border:1px solid #2d2d44; font-size:13px; flex-wrap:wrap; }
+    .lote-summary .summary-item { display:flex; align-items:center; gap:6px; }
+    .lote-summary .summary-item .count { font-weight:700; font-size:15px; }
+    .lote-summary .count-total { color:#e8e8e8; }
+    .lote-summary .count-valid { color:#22c55e; }
+    .lote-summary .count-invalid { color:#ef4444; }
+
+    /* Editable table */
+    .lote-table-wrapper { overflow-x:auto; border-radius:10px; border:1px solid #2d2d44; }
+    .lote-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .lote-table thead { background:#1a1a2e; }
+    .lote-table th { padding:10px 12px; text-align:left; color:#9ca3af; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #2d2d44; }
+    .lote-table td { padding:8px 12px; border-bottom:1px solid #1e1e36; vertical-align:middle; }
+    .lote-table tbody tr { transition:background 0.15s; }
+    .lote-table tbody tr:hover { background:rgba(108,92,231,0.04); }
+
+    /* Row status indicators */
+    .lote-table tbody tr.row-valid { border-left:3px solid #22c55e; }
+    .lote-table tbody tr.row-invalid { border-left:3px solid #ef4444; background:rgba(239,68,68,0.04); }
+    .lote-table tbody tr.row-pending { border-left:3px solid #6b7280; }
+
+    /* Inline inputs */
+    .lote-table input,
+    .lote-table select { width:100%; padding:6px 10px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; font-size:13px; }
+    .lote-table input:focus,
+    .lote-table select:focus { outline:none; border-color:#6c5ce7; box-shadow:0 0 0 2px rgba(108,92,231,0.2); }
+    .lote-table input.input-error,
+    .lote-table select.input-error { border-color:#ef4444; background:rgba(239,68,68,0.05); }
+
+    /* Error tooltip */
+    .error-tooltip { display:flex; align-items:center; gap:6px; font-size:11px; color:#ef4444; margin-top:4px; }
+    .error-tooltip i { font-size:10px; }
+
+    /* Row number */
+    .row-num { color:#6b7280; font-size:12px; font-weight:600; min-width:30px; text-align:center; }
+
+    /* Status icon */
+    .row-status { text-align:center; min-width:30px; }
+    .row-status .fa-check-circle { color:#22c55e; }
+    .row-status .fa-exclamation-circle { color:#ef4444; }
+    .row-status .fa-minus-circle { color:#6b7280; }
+
+    /* Delete row button */
+    .btn-delete-row { background:transparent; border:none; color:#6b7280; cursor:pointer; padding:4px 8px; border-radius:4px; transition:color 0.2s, background 0.2s; }
+    .btn-delete-row:hover { color:#ef4444; background:rgba(239,68,68,0.1); }
+
+    /* Confirm button */
+    .lote-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:16px; flex-wrap:wrap; }
+    .btn-confirm-lote { background:#22c55e; color:#fff; border:none; padding:10px 24px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; display:inline-flex; align-items:center; gap:8px; transition:background 0.2s, opacity 0.2s; }
+    .btn-confirm-lote:hover:not(:disabled) { background:#16a34a; }
+    .btn-confirm-lote:disabled { opacity:0.4; cursor:not-allowed; }
+    .btn-clear-lote { background:#333; color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px; transition:background 0.2s; }
+    .btn-clear-lote:hover { background:#444; }
+
+    /* Empty state */
+    .lote-empty { text-align:center; padding:40px 20px; color:#6b7280; }
+    .lote-empty i { font-size:40px; margin-bottom:12px; display:block; opacity:0.4; }
+    .lote-empty p { font-size:14px; margin-bottom:8px; }
+    .lote-empty .hint { font-size:12px; color:#555; }
+
+    /* Processing overlay */
+    .lote-processing { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+    .lote-processing.show { display:flex; }
+    .lote-processing .spinner { width:40px; height:40px; border:3px solid #333; border-top-color:#6c5ce7; border-radius:50%; animation:spin 0.8s linear infinite; }
+    .lote-processing p { color:#fff; font-size:14px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .lote-actions { flex-direction:column; align-items:stretch; }
+      .lote-summary { flex-direction:column; gap:8px; }
+      .lote-footer { flex-direction:column; }
+      .lote-footer button { width:100%; justify-content:center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 30px;">
+
+        <!-- Header -->
+        <header class="topbar">
+          <h1><i class="fa fa-layer-group"></i> Operaciones por Lote</h1>
+          <div class="top-actions" style="display:flex;align-items:center;gap:12px;">
+            <a href="./inventario.html" style="color:#9ca3af;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+              <i class="fa fa-arrow-left"></i> Volver a inventario
+            </a>
+            <button class="logout-btn" id="btnLogout"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- Actions bar -->
+        <section class="lote-actions">
+          <button class="btn-add-line" id="btnAgregarLinea">
+            <i class="fa fa-plus"></i> Agregar línea
+          </button>
+          <label class="btn-import" for="inputCSV" role="button" tabindex="0" aria-label="Importar archivo CSV">
+            <i class="fa fa-file-csv"></i> Importar CSV
+          </label>
+          <input type="file" id="inputCSV" class="csv-input-hidden" accept=".csv,text/csv" aria-hidden="true">
+          <span style="font-size:12px;color:#6b7280;">Formato: codigo_producto, cantidad, tipo, obra (máx. 500 líneas)</span>
+        </section>
+
+        <!-- Summary -->
+        <section class="lote-summary" id="loteSummary" style="display:none;">
+          <div class="summary-item">
+            <i class="fa fa-list" style="color:#9ca3af;"></i>
+            <span>Total:</span>
+            <span class="count count-total" id="summaryTotal">0</span>
+          </div>
+          <div class="summary-item">
+            <i class="fa fa-check-circle" style="color:#22c55e;"></i>
+            <span>Válidas:</span>
+            <span class="count count-valid" id="summaryValid">0</span>
+          </div>
+          <div class="summary-item">
+            <i class="fa fa-exclamation-circle" style="color:#ef4444;"></i>
+            <span>Con errores:</span>
+            <span class="count count-invalid" id="summaryInvalid">0</span>
+          </div>
+        </section>
+
+        <!-- Editable table -->
+        <section class="historial">
+          <div class="lote-table-wrapper">
+            <table class="lote-table" id="tablaLote">
+              <thead>
+                <tr>
+                  <th style="width:40px;">#</th>
+                  <th style="width:40px;"></th>
+                  <th>Producto (código)</th>
+                  <th style="width:120px;">Cantidad</th>
+                  <th style="width:180px;">Tipo</th>
+                  <th>Obra</th>
+                  <th style="width:50px;"></th>
+                </tr>
+              </thead>
+              <tbody id="loteBody">
+                <!-- Empty state shown by default -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty state -->
+          <div class="lote-empty" id="loteEmpty">
+            <i class="fa fa-inbox"></i>
+            <p>No hay líneas en el lote</p>
+            <span class="hint">Agregue líneas manualmente o importe un archivo CSV para comenzar.</span>
+          </div>
+        </section>
+
+        <!-- Footer actions -->
+        <section class="lote-footer" id="loteFooter" style="display:none;">
+          <button class="btn-clear-lote" id="btnLimpiarLote">
+            <i class="fa fa-trash"></i> Limpiar todo
+          </button>
+          <button class="btn-confirm-lote" id="btnConfirmarLote" disabled>
+            <i class="fa fa-check"></i> Confirmar lote
+          </button>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Processing overlay -->
+  <div class="lote-processing" id="loteProcessing">
+    <div class="spinner"></div>
+    <p>Procesando lote...</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script type="module" src="./lote.controller.js"></script>
+</body>
+</html>

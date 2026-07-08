@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>ADDBOX LLC — Estado del Sistema</title>
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/admin-dashboard/assets/css/portal-autoservicio.css" />
+  <style>
+    .portal-main { max-width: 900px; margin: 0 auto; }
+    .portal-grid { gap: 24px; }
+    .portal-card { padding: 24px 20px; min-height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
+    .portal-icon { font-size: 36px; margin-bottom: 12px; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .status-ok { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .status-warn { background: rgba(249,115,22,0.15); color: #f97316; }
+    .status-down { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .uptime-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+    .uptime-fill { height: 100%; border-radius: 3px; background: #22c55e; }
+  </style>
+</head>
+<body class="portal-body">
+  <header class="portal-header">
+    <div class="portal-logo">
+      <img src="/admin-dashboard/assets/img/logo-addbox-icon.svg" alt="ADDBOX" class="portal-logo-img" />
+      <span class="logo-text">ADDBOX</span>
+    </div>
+    <div class="portal-header-right"><span class="portal-tag">Estado del Sistema</span></div>
+  </header>
+
+  <main class="portal-main">
+    <a href="/portal-autoservicio.html" style="display:inline-block;margin-bottom:16px;padding:8px 14px;border:1px solid rgba(255,255,255,0.4);border-radius:8px;color:#fff;text-decoration:none;font-size:14px;">← Volver al portal</a>
+
+    <section class="portal-intro">
+      <h1>📊 Estado del Sistema</h1>
+      <p>Consulta el estado actual de los servicios de ADDBOX LLC.</p>
+    </section>
+
+    <section class="portal-grid">
+      <article class="portal-card">
+        <div class="portal-icon"><span>🗄️</span></div>
+        <h2>Base de datos</h2>
+        <p>Supabase PostgreSQL</p>
+        <span class="status-badge status-ok">Operativo</span>
+        <div class="uptime-bar"><div class="uptime-fill" style="width:99.9%;"></div></div>
+        <p style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Uptime: 99.9%</p>
+      </article>
+
+      <article class="portal-card">
+        <div class="portal-icon"><span>🔐</span></div>
+        <h2>Autenticación</h2>
+        <p>Supabase Auth v1</p>
+        <span class="status-badge status-ok">Operativo</span>
+        <div class="uptime-bar"><div class="uptime-fill" style="width:99.8%;"></div></div>
+        <p style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Uptime: 99.8%</p>
+      </article>
+
+      <article class="portal-card">
+        <div class="portal-icon"><span>🌐</span></div>
+        <h2>Portal</h2>
+        <p>Frontend estático</p>
+        <span class="status-badge status-ok">Operativo</span>
+        <div class="uptime-bar"><div class="uptime-fill" style="width:100%;"></div></div>
+        <p style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Uptime: 100%</p>
+      </article>
+
+      <article class="portal-card">
+        <div class="portal-icon"><span>📦</span></div>
+        <h2>Inventario</h2>
+        <p>CRUD + búsqueda</p>
+        <span class="status-badge status-ok">Operativo</span>
+        <div class="uptime-bar"><div class="uptime-fill" style="width:99.5%;"></div></div>
+        <p style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Uptime: 99.5%</p>
+      </article>
+
+      <article class="portal-card">
+        <div class="portal-icon"><span>👥</span></div>
+        <h2>RRHH</h2>
+        <p>Módulo completo</p>
+        <span class="status-badge status-ok">Operativo</span>
+        <div class="uptime-bar"><div class="uptime-fill" style="width:99.7%;"></div></div>
+        <p style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Uptime: 99.7%</p>
+      </article>
+
+      <article class="portal-card">
+        <div class="portal-icon"><span>💰</span></div>
+        <h2>Presupuestos</h2>
+        <p>Gestión y envío</p>
+        <span class="status-badge status-warn">En desarrollo</span>
+        <div class="uptime-bar"><div class="uptime-fill" style="width:85%; background:#f97316;"></div></div>
+        <p style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Disponibilidad: 85%</p>
+      </article>
+
+      <article class="portal-card">
+        <div class="portal-icon"><span>📊</span></div>
+        <h2>Reportes</h2>
+        <p>Analítica y gráficas</p>
+        <span class="status-badge status-warn">En desarrollo</span>
+        <div class="uptime-bar"><div class="uptime-fill" style="width:75%; background:#f97316;"></div></div>
+        <p style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Disponibilidad: 75%</p>
+      </article>
+
+      <article class="portal-card">
+        <div class="portal-icon"><span>🛟</span></div>
+        <h2>Soporte</h2>
+        <p>Centro de ayuda</p>
+        <span class="status-badge status-ok">Operativo</span>
+        <div class="uptime-bar"><div class="uptime-fill" style="width:100%;"></div></div>
+        <p style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Uptime: 100%</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="portal-footer">
+    <span>Última actualización: <span id="last-update"></span></span>
+    <span style="display:block; margin-top:8px;">© <span id="year"></span> Addbox LLC — Plataforma de gestión</span>
+  </footer>
+
+  <script>
+    document.getElementById("last-update").textContent = new Date().toLocaleString("es-ES");
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

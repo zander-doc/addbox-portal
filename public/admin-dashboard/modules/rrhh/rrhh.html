@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Recursos Humanos - ADDBOX PRO</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../../assets/css/toast.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .rrhh-modules { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+    .rrhh-card {
+      background: var(--card-bg, rgba(255,255,255,0.03));
+      border: 1px solid var(--border, rgba(255,255,255,0.08));
+      border-radius: 12px; padding: 20px; cursor: pointer; transition: 0.2s;
+    }
+    .rrhh-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); border-color: #6c5ce7; }
+    .rrhh-card-icon { font-size: 24px; margin-bottom: 10px; }
+    .rrhh-card h3 { font-size: 0.95rem; margin-bottom: 4px; }
+    .rrhh-card p { font-size: 0.8rem; opacity: 0.6; }
+    .ai-badge {
+      display: inline-block; padding: 2px 8px;
+      background: linear-gradient(135deg, #6c5ce7, #a855f7);
+      border-radius: 12px; font-size: 0.6rem; font-weight: 600; color: #fff; vertical-align: middle; margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <!-- CONTENIDO (sin sidebar — se usa el del dashboard) -->
+    <main class="content">
+      <div class="dashboard-center" style="gap: 30px;">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <h1>Recursos Humanos <span class="ai-badge">IA</span></h1>
+          <div class="top-actions">
+            <button class="logout-btn" onclick="logout()">
+              <i class="fa fa-right-from-bracket"></i> Salir
+            </button>
+          </div>
+        </header>
+
+        <!-- RESUMEN -->
+        <section class="resumen">
+          <h2 style="font-size: 24px;">RESUMEN RÁPIDO</h2>
+          <div class="grid-cards">
+            <div class="card" style="padding: 18px;">
+              <div>
+                <div class="card-title" style="font-size: 13px;">Empleados activos</div>
+                <div class="card-value" style="font-size: 26px;">24</div>
+              </div>
+              <i class="fa fa-users" style="font-size: 28px;"></i>
+            </div>
+            <div class="card" style="padding: 18px;">
+              <div>
+                <div class="card-title" style="font-size: 13px;">Vacantes abiertas</div>
+                <div class="card-value" style="font-size: 26px;">3</div>
+              </div>
+              <i class="fa fa-briefcase" style="font-size: 28px;"></i>
+            </div>
+            <div class="card" style="padding: 18px;">
+              <div>
+                <div class="card-title" style="font-size: 13px;">Asistencia hoy</div>
+                <div class="card-value" style="font-size: 26px;">96%</div>
+              </div>
+              <i class="fa fa-clock" style="font-size: 28px;"></i>
+            </div>
+            <div class="card" style="padding: 18px;">
+              <div>
+                <div class="card-title" style="font-size: 13px;">Nómina mensual</div>
+                <div class="card-value" style="font-size: 26px;">$18.5K</div>
+              </div>
+              <i class="fa fa-money-bill" style="font-size: 28px;"></i>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACCIONES RÁPIDAS -->
+        <section class="quick-actions" style="flex-wrap: wrap;">
+          <button class="primary" style="padding: 12px 20px; font-size: 14px;" onclick="location.href='contratacion.html'">📋 Contratación</button>
+          <button class="primary" style="padding: 12px 20px; font-size: 14px;" onclick="location.href='capacitacion.html'">🎓 Capacitación</button>
+          <button class="primary" style="padding: 12px 20px; font-size: 14px;" onclick="location.href='asistencias.html'">⏰ Asistencias</button>
+          <button class="primary" style="padding: 12px 20px; font-size: 14px;" onclick="location.href='rendimiento.html'">📊 Rendimiento</button>
+          <button class="primary" style="padding: 12px 20px; font-size: 14px;" onclick="location.href='nomina.html'">💰 Nómina</button>
+          <button class="primary" style="padding: 12px 20px; font-size: 14px;" onclick="location.href='autopedidos.html'">🛒 Autopedidos</button>
+        </section>
+
+        <!-- MÓDULOS DETALLADOS -->
+        <section class="resumen">
+          <h2 style="font-size: 24px;">MÓDULOS DE RRHH</h2>
+          <div class="rrhh-modules">
+            <div class="rrhh-card" onclick="location.href='contratacion.html'">
+              <div class="rrhh-card-icon">📋</div>
+              <h3>Contratación <span class="ai-badge">IA</span></h3>
+              <p>Gestiona vacantes, candidatos, entrevistas y ofertas. La IA sugiere los mejores perfiles.</p>
+            </div>
+            <div class="rrhh-card" onclick="location.href='capacitacion.html'">
+              <div class="rrhh-card-icon">🎓</div>
+              <h3>Capacitación</h3>
+              <p>Programas de formación, cursos asignados, progreso y certificaciones.</p>
+            </div>
+            <div class="rrhh-card" onclick="location.href='asistencias.html'">
+              <div class="rrhh-card-icon">⏰</div>
+              <h3>Asistencias</h3>
+              <p>Control de entrada/salida, horas trabajadas, permisos y ausencias.</p>
+            </div>
+            <div class="rrhh-card" onclick="location.href='rendimiento.html'">
+              <div class="rrhh-card-icon">📊</div>
+              <h3>Rendimiento <span class="ai-badge">IA</span></h3>
+              <p>Evaluaciones de desempeño, KPIs, objetivos y feedback 360°.</p>
+            </div>
+            <div class="rrhh-card" onclick="location.href='nomina.html'">
+              <div class="rrhh-card-icon">💰</div>
+              <h3>Nómina</h3>
+              <p>Cálculo de salarios, deducciones, bonos, horas extra y recibos.</p>
+            </div>
+            <div class="rrhh-card" onclick="location.href='autopedidos.html'">
+              <div class="rrhh-card-icon">🛒</div>
+              <h3>Autopedidos</h3>
+              <p>Los empleados solicitan materiales, equipos o servicios directamente.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACTIVIDAD RECIENTE -->
+        <section class="historial">
+          <h2 style="font-size: 24px;">ACTIVIDAD RECIENTE</h2>
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Empleado</th>
+                <th>Acción</th>
+                <th>Módulo</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>María González</td><td>Entrada registrada</td><td>Asistencias</td><td>Hoy 08:02</td></tr>
+              <tr><td>Carlos Pérez</td><td>Curso completado</td><td>Capacitación</td><td>Hoy 07:45</td></tr>
+              <tr><td>Ana Rodríguez</td><td>Solicitud de material</td><td>Autopedidos</td><td>Ayer 16:30</td></tr>
+              <tr><td>Luis Martínez</td><td>Evaluación enviada</td><td>Rendimiento</td><td>Ayer 14:15</td></tr>
+              <tr><td>Pedro Sánchez</td><td>Nómina procesada</td><td>Nómina</td><td>20/05/2026</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- SUPABASE v1 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+
+  <!-- Auth Guard -->
+  <script type="module">
+    import { requireSession } from "../../services/auth-guard.js";
+    await requireSession();
+    import { requireRole } from "../../services/role-guard.js";
+    await requireRole(["jefe", "admin", "rrhh"]);
+  </script>
+
+  <script>
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = "/portal-autoservicio.html";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Image analysis for UI design review",
+  "description": "Analyze images to understand UI/UX requirements and suggest code changes",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "You are working in an admin dashboard project for an e-commerce system called \"Addbox\".\n\nProject structure:\n- Frontend: d:\\alexander\\arte\\addbox_a5grafic\\Addbox\\frontend\\public\\admin-dashboard\n- Backend: d:\\alexander\\arte\\addbox_a5grafic\\Addbox\\frontend\\public\\src\\ai\\alex\\server\n- Database: MySQL\n\nWhen analyzing an image:\n1. Identify the UI component, layout, or feature shown\n2. Determine which module it belongs to (dashboard, productos, usuarios, devoluciones, etc.)\n3. List the HTML elements, CSS styles, and JavaScript functionality needed\n4. Suggest specific file paths that need to be created or modified\n5. Consider how this integrates with existing modules (navbar, sidebar, etc.)\n\nProvide a detailed technical specification that can be used to implement the design."
+  }
+}

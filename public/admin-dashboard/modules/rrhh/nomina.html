@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Nómina — RRHH ADDBOX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .nomina-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .nomina-table th, .nomina-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; }
+    .nomina-table th { color: #9ca3af; font-weight: 600; }
+    .total-row { font-weight: 700; color: #22c55e; }
+    .back-link { color: #8ab4ff; text-decoration: none; font-size: 0.85rem; }
+    .nomina-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 20px; }
+    .nomina-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; text-align: center; }
+    .nomina-box .val { font-size: 1.4rem; font-weight: 700; }
+    .nomina-box .lbl { font-size: 0.75rem; color: #9ca3af; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <main class="content" style="padding: 24px;">
+      <a href="rrhh.html" class="back-link">← Volver a RRHH</a>
+      <h1 style="margin-top:12px;">💰 Nómina — Mayo 2026</h1>
+
+      <div class="nomina-summary">
+        <div class="nomina-box"><div class="val" style="color:#22c55e;">$18,500</div><div class="lbl">Total nómina</div></div>
+        <div class="nomina-box"><div class="val" style="color:#f97316;">$2,340</div><div class="lbl">Deducciones</div></div>
+        <div class="nomina-box"><div class="val" style="color:#3b82f6;">$16,160</div><div class="lbl">Neto a pagar</div></div>
+      </div>
+
+      <table class="nomina-table">
+        <thead>
+          <tr><th>Empleado</th><th>Cargo</th><th>Salario base</th><th>Horas extra</th><th>Deducciones</th><th>Neto</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>María González</td><td>Supervisora</td><td>$3,200</td><td>$180</td><td>$420</td><td>$2,960</td></tr>
+          <tr><td>Carlos Pérez</td><td>Electricista</td><td>$2,800</td><td>$240</td><td>$380</td><td>$2,660</td></tr>
+          <tr><td>Ana Rodríguez</td><td>Almacenista</td><td>$2,200</td><td>$0</td><td>$290</td><td>$1,910</td></tr>
+          <tr><td>Luis Martínez</td><td>Plomero</td><td>$2,600</td><td>$120</td><td>$340</td><td>$2,380</td></tr>
+          <tr><td>Pedro Sánchez</td><td>Técnico</td><td>$2,400</td><td>$80</td><td>$310</td><td>$2,170</td></tr>
+          <tr><td>Laura Méndez</td><td>Ing. Civil</td><td>$3,500</td><td>$0</td><td>$450</td><td>$3,050</td></tr>
+          <tr><td colspan="5" class="total-row" style="text-align:right;">TOTAL NETO:</td><td class="total-row">$16,160</td></tr>
+        </tbody>
+      </table>
+    </main>
+  </div>
+  <script>function logout(){location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

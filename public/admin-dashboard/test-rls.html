@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Test RLS - ADDBOX</title>
+</head>
+<body>
+  <h1>Test RLS</h1>
+  <button onclick="testUpdate()">Probar actualización</button>
+  <div id="result"></div>
+
+  <!-- SUPABASE v1 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  // 🔄 Reemplazado por supabase-client.js
+  <!--
+  <script>
+    const SUPABASE_URL = "https://billwldqxupcavzurljo.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_riaS1JVqOgTmIXvVMcuMGQ_TLKmbqob";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  </script>
+  -->
+
+  <!-- Auth Guard -->
+  <script type="module">
+    import { requireSession } from "../services/auth-guard.js";
+    await requireSession();
+  </script>
+
+    async function testUpdate() {
+      const resultDiv = document.getElementById("result");
+      
+      try {
+        // Intentar actualizar un producto
+        const { data, error } = await supabase
+          .from("productos")
+          .update({ descripcion: "TEST RLS - " + new Date().toISOString() })
+          .eq("id", "66f7cf6c-9cfb-4818-9395-635f43bfb214")
+          .select();
+        
+        if (error) {
+          resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+          console.error("Error:", error);
+          return;
+        }
+        
+        resultDiv.innerHTML = `<p style="color: green;">Éxito: ${JSON.stringify(data)}</p>`;
+        console.log("Éxito:", data);
+      } catch (err) {
+        resultDiv.innerHTML = `<p style="color: red;">Error inesperado: ${err.message}</p>`;
+        console.error("Error inesperado:", err);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Conexión Neon - ADDBOX</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #2196F3;
+      padding-bottom: 10px;
+    }
+    .success {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .error {
+      color: #f44336;
+      font-weight: bold;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #1976D2;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+    li:before {
+      content: "✓ ";
+      color: #4CAF50;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔌 Test de Conexión a Neon PostgreSQL</h1>
+    
+    <div class="info">
+      <p><strong>Proyecto:</strong> ADDBOX - Sistema de Inventario</p>
+      <p><strong>Base de Datos:</strong> Neon PostgreSQL</p>
+      <p><strong>Estado:</strong> <span id="status">Pendiente</span></p>
+    </div>
+
+    <button id="testBtn" onclick="runTests()">🧪 Ejecutar Tests</button>
+
+    <div id="results"></div>
+  </div>
+
+  <script type="module">
+    import { query, configureNeon, testConnection } from './services/neon-client.js';
+    import { config } from './config/env.js';
+
+    const resultsDiv = document.getElementById('results');
+    const statusSpan = document.getElementById('status');
+    const testBtn = document.getElementById('testBtn');
+
+    // Configurar Neon desde env.js
+    configureNeon(config.neonUrl);
+
+    window.runTests = async function() {
+      testBtn.disabled = true;
+      testBtn.textContent = '⏳ Ejecutando tests...';
+      resultsDiv.innerHTML = '';
+      statusSpan.textContent = 'Ejecutando...';
+
+      try {
+        // Test 1: Conexión básica
+        resultsDiv.innerHTML += '<div class="test-section"><h3>1. Conexión Básica</h3><p>Probando conexión a Neon...</p></div>';
+        
+        const connectionTest = await testConnection();
+        
+        if (connectionTest.ok) {
+          resultsDiv.innerHTML += `
+            <div class="test-section success">
+              <h3>✅ Conexión Exitosa</h3>
+              <p><strong>Mensaje:</strong> ${connectionTest.message}</p>
+            </div>
+          `;
+          statusSpan.textContent = '✅ Conectado';
+          statusSpan.className = 'success';
+        } else {
+          throw new Error(connectionTest.message);
+        }
+
+        // Test 2: Verificar versión de PostgreSQL
+        resultsDiv.innerHTML += '<div class="test-section"><h3>2. Información del Servidor</h3><p>Obteniendo versión de PostgreSQL...</p></div>';
+        
+        const versionResult = await query('SELECT NOW() as now, version() as version');
+        
+        resultsDiv.innerHTML += `
+          <div class="test-section success">
+            <h3>✅ Servidor PostgreSQL</h3>
+            <p><strong>Fecha/Hora:</strong> ${versionResult[0]?.now}</p>
+            <p><strong>Versión:</strong> ${versionResult[0]?.version?.split(',')[0] || 'Desconocida'}</p>
+          </div>
+        `;
+
+        // Test 3: Verificar tablas
+        resultsDiv.innerHTML += '<div class="test-section"><h3>3. Verificando Tablas</h3><p>Consultando tablas en el esquema public...</p></div>';
+        
+        const tablesResult = await query(`
+          SELECT table_name 
+          FROM information_schema.tables 
+          WHERE table_schema = 'public'
+          ORDER BY table_name
+        `);
+        
+        const tables = tablesResult || [];
+        
+        resultsDiv.innerHTML += `
+          <div class="test-section success">
+            <h3>✅ Tablas Encontradas: ${tables.length}</h3>
+            ${tables.length > 0 ? `
+              <ul>
+                ${tables.map(t => `<li>${t.table_name}</li>`).join('')}
+              </ul>
+            ` : '<p>⚠️ No se encontraron tablas. Ejecuta el schema SQL primero.</p>'}
+          </div>
+        `;
+
+        // Test 4: Verificar extensiones
+        resultsDiv.innerHTML += '<div class="test-section"><h3>4. Verificando Extensiones</h3><p>Consultando extensiones instaladas...</p></div>';
+        
+        const extensionsResult = await query(`
+          SELECT extname, extversion 
+          FROM pg_extension 
+          WHERE extname IN ('pgcrypto', 'uuid-ossp')
+        `);
+        
+        const extensions = extensionsResult || [];
+        
+        resultsDiv.innerHTML += `
+          <div class="test-section ${extensions.length > 0 ? 'success' : 'error'}">
+            <h3>${extensions.length > 0 ? '✅' : '⚠️'} Extensiones</h3>
+            ${extensions.length > 0 ? `
+              <ul>
+                ${extensions.map(e => `<li><strong>${e.extname}</strong> v${e.extversion}</li>`).join('')}
+              </ul>
+            ` : '<p>No se encontraron extensiones. Asegúrate de ejecutar CREATE EXTENSION pgcrypto;</p>'}
+          </div>
+        `;
+
+        // Test 5: Verificar funciones RPC
+        resultsDiv.innerHTML += '<div class="test-section"><h3>5. Verificando Funciones RPC</h3><p>Consultando funciones personalizadas...</p></div>';
+        
+        const functionsResult = await query(`
+          SELECT proname, prorettype::regtype as return_type
+          FROM pg_proc
+          WHERE pronamespace = 'public'::regnamespace
+          AND proname IN ('registrar_movimiento', 'productos_por_categoria', 'procesar_lote')
+        `);
+        
+        const functions = functionsResult || [];
+        
+        resultsDiv.innerHTML += `
+          <div class="test-section ${functions.length > 0 ? 'success' : 'error'}">
+            <h3>${functions.length > 0 ? '✅' : '⚠️'} Funciones RPC: ${functions.length}/3</h3>
+            ${functions.length > 0 ? `
+              <ul>
+                ${functions.map(f => `<li><strong>${f.proname}</strong> → ${f.return_type}</li>`).join('')}
+              </ul>
+            ` : '<p>No se encontraron funciones RPC. Ejecuta el schema SQL completo.</p>'}
+          </div>
+        `;
+
+        // Test 6: Verificar datos iniciales
+        resultsDiv.innerHTML += '<div class="test-section"><h3>6. Verificando Datos Iniciales</h3><p>Consultando registros de prueba...</p></div>';
+        
+        const [productos, obras, usuarios] = await Promise.all([
+          query('SELECT COUNT(*) as count FROM productos'),
+          query('SELECT COUNT(*) as count FROM obras'),
+          query('SELECT COUNT(*) as count FROM usuarios'),
+        ]);
+
+        resultsDiv.innerHTML += `
+          <div class="test-section success">
+            <h3>✅ Datos Iniciales</h3>
+            <ul>
+              <li><strong>Productos:</strong> ${productos[0]?.count || 0}</li>
+              <li><strong>Obras:</strong> ${obras[0]?.count || 0}</li>
+              <li><strong>Usuarios:</strong> ${usuarios[0]?.count || 0}</li>
+            </ul>
+          </div>
+        `;
+
+        // Resumen final
+        const allTestsPassed = tables.length > 0 && extensions.length > 0 && functions.length === 3;
+        
+        resultsDiv.innerHTML += `
+          <div class="test-section ${allTestsPassed ? 'success' : 'error'}">
+            <h2>${allTestsPassed ? '✅' : '⚠️'} Resumen de Tests</h2>
+            <p><strong>Conexión:</strong> ✅ Exitosa</p>
+            <p><strong>Tablas:</strong> ${tables.length > 0 ? '✅' : '❌'} (${tables.length})</p>
+            <p><strong>Extensiones:</strong> ${extensions.length > 0 ? '✅' : '❌'} (${extensions.length})</p>
+            <p><strong>Funciones RPC:</strong> ${functions.length === 3 ? '✅' : '❌'} (${functions.length}/3)</p>
+            <p><strong>Datos:</strong> ✅ (${productos[0]?.count || 0} productos, ${obras[0]?.count || 0} obras)</p>
+            
+            ${allTestsPassed ? 
+              '<p class="success">🎉 ¡Todos los tests pasaron! El sistema está listo para usar.</p>' : 
+              '<p class="error">⚠️ Algunos tests fallaron. Revisa los errores arriba y ejecuta el schema SQL.</p>'
+            }
+          </div>
+        `;
+
+        statusSpan.textContent = allTestsPassed ? '✅ Listo' : '⚠️ Incompleto';
+
+      } catch (error) {
+        resultsDiv.innerHTML = `
+          <div class="test-section error">
+            <h2>❌ Error en Tests</h2>
+            <p><strong>Error:</strong> ${error.message}</p>
+            <p><strong>Solución:</strong></p>
+            <ul>
+              <li>Verifica que NEON_DATABASE_URL esté configurada</li>
+              <li>Asegúrate de que la base de datos esté activa (no pausada)</li>
+              <li>Ejecuta el schema SQL en Neon SQL Editor</li>
+              <li>Verifica que la URL tenga el formato correcto</li>
+            </ul>
+          </div>
+        `;
+        statusSpan.textContent = '❌ Error';
+        statusSpan.className = 'error';
+      } finally {
+        testBtn.disabled = false;
+        testBtn.textContent = '🧪 Ejecutar Tests Nuevamente';
+      }
+    };
+
+    // Auto-ejecutar tests al cargar
+    setTimeout(runTests, 500);
+  </script>
+</body>
+</html>

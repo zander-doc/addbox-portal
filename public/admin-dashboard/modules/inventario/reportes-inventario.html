@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Reportes de Inventario - ADDBOX Inventory</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Report type selector */
+    .report-selector { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .report-selector label { font-size:13px; color:#9ca3af; white-space:nowrap; }
+    .report-selector select { padding:8px 14px; border:1px solid #333; border-radius:8px; background:#111; color:#fff; font-size:14px; min-width:220px; }
+
+    /* Filters section */
+    .filters-section { display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; padding:16px; background:#1a1a2e; border-radius:12px; border:1px solid #333; }
+    .filters-section .filter-group { display:flex; flex-direction:column; gap:4px; }
+    .filters-section label { font-size:12px; color:#9ca3af; }
+    .filters-section input,
+    .filters-section select { padding:8px 12px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; font-size:13px; min-width:160px; }
+    .filters-section input[type="date"] { min-width:140px; }
+    .filters-section .btn-filter { padding:8px 16px; border:none; border-radius:6px; background:#6c5ce7; color:#fff; cursor:pointer; font-size:13px; font-weight:500; align-self:flex-end; }
+    .filters-section .btn-filter:hover { background:#5a4bd6; }
+    .filters-section .btn-filter:disabled { opacity:0.5; cursor:not-allowed; }
+
+    /* Export button */
+    .btn-export { padding:8px 16px; border:1px solid #6c5ce7; border-radius:6px; background:transparent; color:#6c5ce7; cursor:pointer; font-size:13px; font-weight:500; display:inline-flex; align-items:center; gap:6px; }
+    .btn-export:hover { background:rgba(108,92,231,0.1); }
+    .btn-export:disabled { opacity:0.4; cursor:not-allowed; }
+
+    /* Results header */
+    .results-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+    .results-header h3 { font-size:14px; color:#9ca3af; margin:0; }
+    .results-info { font-size:12px; color:#6b7280; }
+
+    /* Gran total */
+    .gran-total { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; background:rgba(108,92,231,0.1); border:1px solid rgba(108,92,231,0.3); border-radius:8px; font-size:14px; color:#a78bfa; font-weight:600; }
+
+    /* Empty state */
+    .empty-state { text-align:center; padding:40px 20px; color:#6b7280; }
+    .empty-state i { font-size:48px; margin-bottom:12px; color:#374151; }
+    .empty-state p { font-size:14px; margin:0; }
+
+    /* Pagination */
+    .pagination { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; }
+    .pagination button { padding:6px 12px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; cursor:pointer; font-size:13px; }
+    .pagination button:hover:not(:disabled) { background:#222; border-color:#6c5ce7; }
+    .pagination button:disabled { opacity:0.4; cursor:not-allowed; }
+    .pagination .page-info { font-size:13px; color:#9ca3af; }
+
+    /* Hidden utility */
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 30px;">
+
+        <!-- Header -->
+        <header class="topbar">
+          <h1>Reportes de Inventario</h1>
+          <div class="top-actions" style="display:flex;align-items:center;gap:12px;">
+            <button class="logout-btn" id="btnLogout"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- Report Type Selector -->
+        <section class="report-selector">
+          <label for="selectTipoReporte"><i class="fa fa-chart-bar"></i> Tipo de reporte:</label>
+          <select id="selectTipoReporte">
+            <option value="">Seleccionar tipo de reporte...</option>
+            <option value="existencias">Existencias</option>
+            <option value="movimientos">Movimientos</option>
+            <option value="valorizacion">Valorización</option>
+            <option value="rotacion">Rotación</option>
+          </select>
+        </section>
+
+        <!-- Dynamic Filters -->
+        <section class="filters-section hidden" id="sectionFiltros">
+          <!-- Filtros para Movimientos -->
+          <div class="filter-group" id="filtroFechaInicio">
+            <label for="inputFechaInicio">Fecha inicio</label>
+            <input type="date" id="inputFechaInicio">
+          </div>
+          <div class="filter-group" id="filtroFechaFin">
+            <label for="inputFechaFin">Fecha fin</label>
+            <input type="date" id="inputFechaFin">
+          </div>
+          <div class="filter-group hidden" id="filtroTipoMovimiento">
+            <label for="selectTipoMovimiento">Tipo de movimiento</label>
+            <select id="selectTipoMovimiento">
+              <option value="">Todos</option>
+              <option value="entrada">Entrada</option>
+              <option value="salida">Salida</option>
+              <option value="transferencia_salida">Transferencia salida</option>
+              <option value="transferencia_entrada">Transferencia entrada</option>
+              <option value="ajuste">Ajuste</option>
+            </select>
+          </div>
+          <div class="filter-group hidden" id="filtroProducto">
+            <label for="selectProducto">Producto</label>
+            <select id="selectProducto">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="filter-group hidden" id="filtroObra">
+            <label for="selectObra">Obra</label>
+            <select id="selectObra">
+              <option value="">Todas</option>
+            </select>
+          </div>
+          <button class="btn-filter" id="btnGenerarReporte">
+            <i class="fa fa-search"></i> Generar reporte
+          </button>
+        </section>
+
+        <!-- Results Section -->
+        <section class="historial hidden" id="sectionResultados">
+          <div class="results-header">
+            <h3 id="tituloResultados">Resultados</h3>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="results-info" id="infoResultados"></span>
+              <button class="btn-export" id="btnExportarCSV" disabled>
+                <i class="fa fa-file-csv"></i> Exportar CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Gran Total (for existencias/valorizacion) -->
+          <div class="gran-total hidden" id="granTotal">
+            <i class="fa fa-coins"></i>
+            <span>Gran Total: </span>
+            <span id="granTotalValor">$0.00</span>
+          </div>
+
+          <!-- Results Table -->
+          <table class="dashboard-table" id="tablaResultados">
+            <thead id="tablaHead">
+              <tr></tr>
+            </thead>
+            <tbody id="tablaBody">
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div class="empty-state hidden" id="emptyState">
+            <i class="fa fa-inbox"></i>
+            <p>No se encontraron datos para los criterios seleccionados.</p>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination" id="paginacion">
+            <button id="btnPagAnterior" disabled><i class="fa fa-chevron-left"></i> Anterior</button>
+            <span class="page-info" id="paginaInfo">Página 1</span>
+            <button id="btnPagSiguiente" disabled>Siguiente <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script type="module" src="./reportes-inventario.controller.js"></script>
+</body>
+</html>

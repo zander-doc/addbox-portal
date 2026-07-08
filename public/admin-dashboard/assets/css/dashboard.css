@@ -1,0 +1,828 @@
+/* ============================================================
+   ADDBOX — DASHBOARD PREMIUM UI
+   Tema oscuro moderno con gradientes, glassmorphism y animaciones
+============================================================ */
+
+/* ------------------------------
+   VARIABLES DE COLOR
+------------------------------ */
+:root {
+  --bg-dark: #0d0f14;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --glass: rgba(255, 255, 255, 0.06);
+  --border-glass: rgba(255, 255, 255, 0.12);
+  --text-light: #e8e8e8;
+  --text-muted: #9aa0b2;
+  --primary: #6c5ce7;
+  --primary-glow: #a29bfe;
+  --accent: #00d2ff;
+  --danger: #ff7675;
+}
+
+/* ------------------------------
+   BODY
+------------------------------ */
+body {
+  background: var(--bg-dark);
+  color: var(--text-light);
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ------------------------------
+   LAYOUT GENERAL
+------------------------------ */
+.main-layout {
+  display: flex;
+  gap: 0;
+  padding: 0;
+}
+
+/* ------------------------------
+   SIDEBAR PREMIUM
+------------------------------ */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  border-right: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 20px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar-logo h2 {
+  color: var(--primary-glow);
+  font-weight: 800;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu .menu-title {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 15px 0 8px;
+  padding-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.sidebar-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  color: var(--text-muted);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.25s ease;
+}
+
+.sidebar-menu li a i {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.sidebar-menu li a:hover {
+  background: linear-gradient(90deg, var(--primary), transparent);
+  color: white;
+  transform: translateX(6px);
+}
+
+.sidebar-menu li a:hover i {
+  color: white;
+}
+
+/* ------------------------------
+   CONTENIDO PRINCIPAL
+------------------------------ */
+.content {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0px 20px;
+}
+
+/* ------------------------------
+   TOPBAR — ALINEADO A LA DERECHA
+------------------------------ */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--glass);
+
+  padding: 24px 40px;
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-bottom: 40px;
+
+  border-radius: 16px;
+  border: 1px solid var(--border-glass);
+}
+
+.topbar h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, var(--danger), #9aa1ff);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ------------------------------
+   SECCIONES
+------------------------------ */
+.dashboard-wrapper-800 {
+  display: flex;
+  flex-direction: column;
+  gap: 55px;
+}
+
+/* ------------------------------
+   CARDS — QUICK SUMMARY
+------------------------------ */
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background: var(--bg-card);
+  padding: 16px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border-glass);
+  transition: 0.25s ease;
+  box-shadow: 0 0 10px rgba(108, 92, 231, 0.15);
+  height: 170px;
+}
+
+.card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 0 18px rgba(108, 92, 231, 0.45);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+.card-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary-glow);
+}
+
+.card i {
+  color: var(--accent);
+  opacity: 0.9;
+  transition: 0.3s ease;
+  font-size: 32px;
+}
+
+/* ------------------------------
+   QUICK ACTIONS
+------------------------------ */
+.quick-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.quick-actions .primary {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.25s ease;
+  font-size: 14px;
+  position: relative;
+  overflow: hidden;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.quick-actions .primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.quick-actions .primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.15);
+  transition: 0.4s;
+}
+
+.quick-actions .primary:hover::after {
+  left: 0;
+}
+
+.quick-actions .primary i {
+  font-size: 22px;
+}
+
+/* ------------------------------
+   GRÁFICAS PREMIUM
+------------------------------ */
+.charts-section {
+  margin-bottom: 24px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.chart-box {
+  background: var(--glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 220px;
+  max-height: 300px;
+  overflow: hidden;
+  box-shadow: 0 0 18px rgba(108, 92, 231, 0.15);
+  transition: 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-box h3 {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chart-box > div {
+  flex: 1;
+  min-height: 0;
+}
+
+.chart-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 28px rgba(108, 92, 231, 0.35);
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------
+   TABLA — MOVIMIENTOS RECIENTES
+------------------------------ */
+.dashboard-table {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: var(--glass);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.dashboard-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.dashboard-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-glass);
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.dashboard-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ------------------------------
+   MODAL STYLING
+------------------------------ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: 0.25s ease;
+}
+
+.modal-close:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-light);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+/* ------------------------------
+   FORM STYLING
+------------------------------ */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.form-group .required {
+  color: var(--danger);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-light);
+  font-size: 14px;
+  transition: 0.25s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+  border-color: var(--danger);
+  background: rgba(255, 118, 117, 0.05);
+}
+
+.error-message {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--danger);
+  min-height: 16px;
+}
+
+/* ------------------------------
+   PASSWORD GROUP
+------------------------------ */
+.password-group {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.6;
+}
+
+.toggle-password:hover {
+  opacity: 1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.form-actions .btn-secondary {
+  flex: 1;
+  padding: 12px 20px;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-light);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.form-actions .btn-secondary:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--text-muted);
+}
+
+.form-actions .btn-primary {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.form-actions .btn-primary:hover {
+  box-shadow: 0 0 15px rgba(108, 92, 231, 0.4);
+}
+
+.form-actions .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ------------------------------
+   MESSAGES
+------------------------------ */
+.error {
+  color: var(--danger);
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.success {
+  color: #4cd964;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+/* ------------------------------
+   SEARCH BAR STYLING
+------------------------------ */
+.search-container {
+  position: relative;
+}
+
+.search-container .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-light);
+  font-size: 14px;
+  transition: 0.25s ease;
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+.search-container input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ------------------------------
+   NOTIFICATIONS
+------------------------------ */
+.notificaciones {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.notificaciones p {
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   ALINEACIÓN MILIMÉTRICA — TODO CENTRADO COMO EL TOPBAR
+============================================================ */
+
+/* Contenedor central único */
+.dashboard-center {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Quitar padding lateral que descuadra todo */
+.content {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Alinear tarjetas, gráficas, tabla y notificaciones */
+.grid-cards,
+.charts-grid,
+.dashboard-table,
+.notificaciones,
+.quick-actions {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Ajuste de secciones internas */
+.resumen,
+.graficas,
+.historial,
+.notificaciones {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.graficas {
+  margin-bottom: 30px;
+}
+
+/* ------------------------------
+   MODAL EDITAR PRODUCTO
+------------------------------ */
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-overlay .modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-overlay .modal h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-light);
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.modal-overlay .modal form {
+  padding: 24px;
+}
+
+.modal-overlay .modal label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.modal-overlay .modal input,
+.modal-overlay .modal select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-light);
+  font-size: 14px;
+  transition: 0.25s ease;
+}
+
+.modal-overlay .modal input:focus,
+.modal-overlay .modal select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+}
+
+.modal-overlay .modal .modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-overlay .modal .modal-actions button {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.modal-overlay .modal .modal-actions #btnCerrarEditar {
+  background: transparent;
+  border: 1px solid var(--border-glass);
+  color: var(--text-light);
+}
+
+.modal-overlay .modal .modal-actions #btnCerrarEditar:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--text-muted);
+}
+
+.modal-overlay .modal .modal-actions #btnGuardarEditar {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border: none;
+  color: white;
+}
+
+.modal-overlay .modal .modal-actions #btnGuardarEditar:hover {
+  box-shadow: 0 0 15px rgba(108, 92, 231, 0.4);
+}
+
+select {
+  background: #1f1f1f !important;
+  color: #e5e5e5 !important;
+  border: 1px solid #333 !important;
+}
+
+select option {
+  background: #1f1f1f !important;
+  color: #e5e5e5 !important;
+}
+
+/* ============================================================
+   DASHBOARD PREMIUM — Glassmorphism enhancements
+============================================================ */
+
+/* Tarjetas de indicadores */
+.card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+}
+
+/* Gráficas — glass override */
+.chart-box {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+/* Tabla de movimientos */
+.dashboard-table {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 16px;
+}
+.dashboard-table th {
+  color: #ffffff;
+  font-weight: 600;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.dashboard-table td {
+  padding: 10px;
+  color: #dcdcdc;
+}
+.dashboard-table tr:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* Topbar fondo negro sólido para contraste al hacer scroll */
+.topbar {
+  background: #000000;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}

@@ -1,0 +1,94 @@
+<aside class="app-sidebar">
+  <!-- Auth Guard -->
+  <script type="module">
+    import { requireSession } from "../services/auth-guard.js";
+    await requireSession();
+  </script>
+  <div>
+    <div class="app-sidebar-logo">
+      <span>AD</span>
+      <div>
+        <div style="font-size:13px;">ADDBOX</div>
+        <div style="font-size:11px; opacity:.7;">Panel de control</div>
+      </div>
+    </div>
+
+    <nav class="app-sidebar-nav">
+
+      <div class="app-sidebar-section-title">Principal</div>
+
+      <a href="/admin-dashboard/modules/dashboard/dashboard.html" class="app-sidebar-link active">
+        Dashboard
+      </a>
+
+      <div class="app-sidebar-section-title">Inventario</div>
+
+      <a href="/admin-dashboard/modules/obras/obras.html" class="app-sidebar-link">
+        Obras
+      </a>
+
+      <a href="/admin-dashboard/modules/productos/productos.html" class="app-sidebar-link">
+        Productos
+      </a>
+
+      <a href="/admin-dashboard/modules/movimientos/movimientos.html" class="app-sidebar-link">
+        Movimientos
+      </a>
+
+      <div class="app-sidebar-section-title">Gestión</div>
+
+      <a href="/admin-dashboard/modules/documentos/documentos.html" class="app-sidebar-link">
+        Documentos
+      </a>
+
+      <a href="/admin-dashboard/modules/devoluciones/devoluciones.html" class="app-sidebar-link">
+        Devoluciones
+      </a>
+
+      <a href="/admin-dashboard/modules/inventario/inventario-valorado.html" class="app-sidebar-link">
+        Inventario Valorado
+      </a>
+
+      <a href="/admin-dashboard/modules/reportes/devoluciones.html" class="app-sidebar-link">
+        Reportes de Devoluciones
+      </a>
+
+      <a href="/admin-dashboard/modules/inventario/stock-por-obra.html" class="app-sidebar-link">
+        Stock por Obra
+      </a>
+
+      <a href="/admin-dashboard/modules/inventario/control-inventario.html" class="app-sidebar-link">
+        Control de Inventario
+      </a>
+
+      <a href="/admin-dashboard/modules/importacion/configuracion.html" class="app-sidebar-link">
+        Importación y Configuración
+      </a>
+
+      <div class="app-sidebar-section-title">Gestión de Usuarios</div>
+
+      <a href="/admin-dashboard/modules/usuarios/usuarios.html" class="app-sidebar-link">
+        Usuarios
+      </a>
+
+      <div class="app-sidebar-section-title">Reportes</div>
+
+      <a href="/admin-dashboard/modules/reportes/reportes.html" class="app-sidebar-link">
+        Reportes
+      </a>
+
+      <div class="app-sidebar-section-title">Recursos Humanos</div>
+
+      <a href="/admin-dashboard/modules/rrhh/rrhh.html" class="app-sidebar-link">
+        RRHH Panel
+      </a>
+
+      <div class="app-sidebar-section-title">Inteligencia Artificial</div>
+
+      <a href="/admin-dashboard/modules/admin/alex-panel.html" class="app-sidebar-link">
+        🤖 Alex Panel
+      </a>
+
+    </nav>
+  </div>
+</aside>

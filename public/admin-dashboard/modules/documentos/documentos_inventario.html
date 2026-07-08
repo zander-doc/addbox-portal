@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Documentos de Inventario - ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../../assets/css/toast.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="./documentos_inventario.css">
+  <style>
+    .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal-card-wide { background:#1a1a2e; border-radius:12px; padding:24px; width:95%; max-width:950px; max-height:90vh; overflow-y:auto; }
+    .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px 20px; margin-bottom:16px; }
+    .form-grid-2 label { font-size:12px; color:#9ca3af; margin-bottom:2px; }
+    .form-grid-2 input, .form-grid-2 textarea, .form-grid-2 select { width:100%; padding:6px 10px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; font-size:13px; }
+    .form-grid-2 textarea { min-height:50px; }
+    .tabla-materiales { width:100%; border-collapse:collapse; margin-bottom:10px; font-size:12px; }
+    .tabla-materiales th, .tabla-materiales td { padding:6px 8px; border-bottom:1px solid #2d2d44; }
+    .tabla-materiales th { text-align:left; color:#9ca3af; font-size:11px; text-transform:uppercase; }
+    .tabla-materiales input { width:100%; padding:4px 6px; border:1px solid #333; border-radius:4px; background:#111; color:#fff; font-size:12px; }
+    .tabla-materiales .btn-rm { background:none; border:none; color:#ef4444; cursor:pointer; font-size:14px; }
+    .btn-add-line { background:#2d2d44; border:1px solid #444; color:#fff; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; }
+    .btn-add-line:hover { border-color:#6c5ce7; }
+    .modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+    .modal-actions button { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-size:13px; }
+    .btn-save { background:#6c5ce7; color:#fff; }
+    .btn-cancel { background:#333; color:#fff; }
+    .filtros-bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 16px; background:rgba(255,255,255,0.04); border-radius:10px; border:1px solid #2d2d44; margin-bottom:16px; }
+    .filtros-bar select, .filtros-bar input[type="date"] { padding:6px 10px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; font-size:13px; }
+    .filtros-bar .btn-filtrar { background:#6c5ce7; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
+    .docs-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .docs-table th, .docs-table td { padding:10px 12px; border-bottom:1px solid #2d2d44; text-align:left; }
+    .docs-table th { color:#9ca3af; font-size:11px; text-transform:uppercase; }
+    .docs-table .btn-pdf { background:#6c5ce7; color:#fff; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:11px; }
+    .docs-table .btn-excel { background:#27ae60; color:#fff; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:11px; }
+    .docs-table .btn-excel:hover { background:#219a52; }
+    .docs-table .btn-del { background:#ef4444; color:#fff; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:11px; }
+    .docs-table .btn-del:hover { background:#dc2626; }
+    .item-busqueda { padding:8px 12px; cursor:pointer; border-bottom:1px solid #2d2d44; font-size:12px; }
+    .item-busqueda:hover { background:rgba(108,92,231,0.15); }
+    .item-busqueda strong { color:#6c5ce7; }
+    .btn-agregar-cat { background:#6c5ce7; color:#fff; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:11px; }
+    .btn-agregar-cat:hover { background:#5a4bd6; }
+
+    /* PDF Template */
+    .doc-print { display:none; }
+
+    @media print {
+      body { background:#fff !important; }
+      .main-layout, .modal-overlay { display:none !important; }
+      .doc-print { display:block !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 30px;">
+        <header class="topbar">
+          <h1><i class="fa fa-file-contract"></i> Documentos de Inventario</h1>
+          <div class="top-actions">
+            <button class="btn-save" id="btnNuevoDoc" style="padding:8px 16px;">
+              <i class="fa fa-plus"></i> Nuevo documento
+            </button>
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- Filtros -->
+        <section class="filtros-bar">
+          <select id="filtroTipo">
+            <option value="">Todos los tipos</option>
+            <option value="TRASLADO">Traslado de materiales</option>
+            <option value="REQ_MATERIALES">Requisición de materiales</option>
+            <option value="REQ_HERRAMIENTA">Requisición de herramienta</option>
+          </select>
+          <input type="date" id="filtroDesde">
+          <input type="date" id="filtroHasta">
+          <button class="btn-filtrar" id="btnFiltrar"><i class="fa fa-filter"></i> Filtrar</button>
+        </section>
+
+        <!-- Lista -->
+        <section class="historial">
+          <table class="docs-table">
+            <thead>
+              <tr><th>N°</th><th>Tipo</th><th>Proyecto/Obra</th><th>Solicitado por</th><th>Fecha</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="docsBody">
+              <tr><td colspan="6" style="text-align:center;color:#9ca3af;">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Nuevo Documento -->
+  <div class="modal-overlay" id="modalDoc">
+    <div class="modal-card-wide">
+      <h3><i class="fa fa-file-contract"></i> Nuevo Documento de Inventario</h3>
+      <div class="form-grid-2">
+        <div>
+          <label>Tipo de documento *</label>
+          <select id="docTipo">
+            <option value="TRASLADO">Traslado de materiales</option>
+            <option value="REQ_MATERIALES">Requisición de materiales</option>
+            <option value="REQ_HERRAMIENTA">Requisición de herramienta</option>
+          </select>
+        </div>
+        <div>
+          <label>Proyecto / Obra *</label>
+          <input type="text" id="docProyecto" placeholder="Nombre del proyecto u obra">
+        </div>
+        <div id="campoOrigen">
+          <label>Origen</label>
+          <input type="text" id="docOrigen" placeholder="Almacén central, sede, etc.">
+        </div>
+        <div id="campoDestino">
+          <label>Destino</label>
+          <input type="text" id="docDestino" placeholder="Obra X, sede Y, etc.">
+        </div>
+        <div>
+          <label>Solicitado por *</label>
+          <input type="text" id="docSolicitadoPor" placeholder="Nombre del solicitante">
+        </div>
+        <div>
+          <label>Autorizado por</label>
+          <input type="text" id="docAutorizadoPor" placeholder="Nombre de quien autoriza">
+        </div>
+        <div>
+          <label>Transportista</label>
+          <input type="text" id="docTransportista" placeholder="Nombre del transportista">
+        </div>
+        <div>
+          <label>Observaciones</label>
+          <textarea id="docObservaciones" placeholder="Notas adicionales..."></textarea>
+        </div>
+      </div>
+
+      <h4 style="font-size:13px;margin-bottom:8px;">Materiales / Herramientas</h4>
+
+      <!-- Búsqueda rápida de productos -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;position:relative;">
+        <input type="text" id="buscarProducto" placeholder="Buscar por código o descripción…" style="flex:1;padding:6px 10px;border:1px solid #333;border-radius:6px;background:#111;color:#fff;font-size:13px;">
+        <button type="button" class="btn-add-line" id="btnAbrirCatalogo"><i class="fa fa-book"></i> Catálogo</button>
+        <div id="resultadoBusqueda" style="display:none;position:absolute;top:100%;left:0;right:80px;background:#1a1a2e;border:1px solid #444;border-radius:6px;max-height:200px;overflow-y:auto;z-index:100;"></div>
+      </div>
+
+      <table class="tabla-materiales">
+        <thead>
+          <tr><th>Código</th><th>Descripción</th><th>Unidad</th><th>Cantidad</th><th>Obs.</th><th></th></tr>
+        </thead>
+        <tbody id="docMaterialesBody"></tbody>
+      </table>
+      <button type="button" class="btn-add-line" id="btnAgregarLinea"><i class="fa fa-plus"></i> Agregar línea</button>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="btnCancelarDoc">Cancelar</button>
+        <button type="button" class="btn-save" id="btnGuardarDoc"><i class="fa fa-file-pdf"></i> Guardar y generar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Catálogo de Productos -->
+  <div class="modal-overlay" id="modalCatalogo">
+    <div class="modal-card-wide" style="max-width:750px;">
+      <h3><i class="fa fa-book"></i> Catálogo de Productos</h3>
+      <div style="display:flex;gap:10px;margin-bottom:12px;">
+        <input type="text" id="catalogoBuscar" placeholder="Buscar…" style="flex:1;padding:6px 10px;border:1px solid #333;border-radius:6px;background:#111;color:#fff;font-size:13px;">
+        <select id="catalogoCategoria" style="padding:6px 10px;border:1px solid #333;border-radius:6px;background:#111;color:#fff;font-size:13px;">
+          <option value="">Todas las categorías</option>
+        </select>
+      </div>
+      <div style="max-height:400px;overflow-y:auto;">
+        <table class="docs-table" style="font-size:12px;">
+          <thead><tr><th>Código</th><th>Descripción</th><th>Unidad</th><th>Existencia</th><th></th></tr></thead>
+          <tbody id="catalogoBody">
+            <tr><td colspan="5" style="text-align:center;color:#9ca3af;">Busque un producto...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="btnCerrarCatalogo">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plantilla PDF (oculta) -->
+  <div id="docPrintContainer" class="doc-print">
+    <div class="doc-print-inner" id="docPrintContent">
+      <header class="doc-header">
+        <div class="doc-empresa">
+          <h2>ADDBOX LLC, C.A</h2>
+          <div>RIF: J-41211531-6</div>
+          <div>Urb. Guayabitos Vegas y Potreros de Guayabal,</div>
+          <div>lote F, galpón 1, callejón La Caña,</div>
+          <div>sector Guayabal.</div>
+        </div>
+        <div class="doc-titulo">
+          <h3 id="printTipoTitulo"></h3>
+          <div><strong>N°:</strong> <span id="printNumero"></span></div>
+          <div><strong>Fecha:</strong> <span id="printFecha"></span></div>
+        </div>
+        <div class="doc-qr">
+          <canvas id="docQR" width="80" height="80"></canvas>
+        </div>
+      </header>
+      <section class="doc-meta">
+        <div><strong>Proyecto / Obra:</strong> <span id="printProyecto"></span></div>
+        <div id="printOrigenRow"><strong>Origen:</strong> <span id="printOrigen"></span> &nbsp;&nbsp; <strong>Destino:</strong> <span id="printDestino"></span></div>
+        <div><strong>Solicitado por:</strong> <span id="printSolicitadoPor"></span></div>
+        <div><strong>Autorizado por:</strong> <span id="printAutorizadoPor"></span></div>
+        <div><strong>Transportista:</strong> <span id="printTransportista"></span></div>
+      </section>
+      <section class="doc-materiales">
+        <table>
+          <thead><tr><th>Código</th><th>Descripción</th><th>Unidad</th><th>Cantidad</th><th>Obs.</th></tr></thead>
+          <tbody id="printMaterialesBody"></tbody>
+        </table>
+      </section>
+      <section class="doc-observaciones">
+        <strong>Observaciones:</strong>
+        <p id="printObservaciones"></p>
+      </section>
+      <section class="doc-firmas">
+        <div><div class="firma-linea"></div><span>Solicitante</span></div>
+        <div><div class="firma-linea"></div><span>Almacén</span></div>
+        <div><div class="firma-linea"></div><span>Autorizado</span></div>
+        <div><div class="firma-linea"></div><span>Transportista</span></div>
+      </section>
+      <footer class="doc-footer">
+        <span>Documento interno de inventario generado por ADDBOX</span>
+      </footer>
+    </div>
+  </div>
+
+  <!-- CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script type="module" src="./documentos_inventario.controller.js"></script>
+  <script>function logout(){window.location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

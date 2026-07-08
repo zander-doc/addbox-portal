@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Devoluciones / Materiales Fuera - ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="../../assets/css/toast.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .cards-resumen { display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+    .card-resumen { background:rgba(255,255,255,0.04); border:1px solid #2d2d44; border-radius:10px; padding:16px 20px; flex:1; min-width:180px; }
+    .card-resumen .valor { font-size:28px; font-weight:bold; }
+    .card-resumen .label { font-size:12px; color:#9ca3af; margin-top:4px; }
+    .card-resumen.alerta .valor { color:#f59e0b; }
+    .card-resumen.peligro .valor { color:#ef4444; }
+    .card-resumen.ok .valor { color:#22c55e; }
+    .card-resumen.info .valor { color:#6c5ce7; }
+
+    .filtros-bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 16px; background:rgba(255,255,255,0.04); border-radius:10px; border:1px solid #2d2d44; margin-bottom:16px; }
+    .filtros-bar input, .filtros-bar select { padding:6px 10px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; font-size:13px; }
+    .filtros-bar input[type="text"] { flex:1; min-width:180px; }
+    .filtros-bar input[type="date"] { width:140px; }
+    .filtros-bar input[type="number"] { width:80px; }
+    .filtros-bar select { min-width:140px; }
+
+    .dev-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .dev-table th, .dev-table td { padding:10px 12px; border-bottom:1px solid #2d2d44; text-align:left; }
+    .dev-table th { color:#9ca3af; font-size:11px; text-transform:uppercase; }
+    .dev-table .btn-devolver { background:#6c5ce7; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px; margin-right:4px; }
+    .dev-table .btn-devolver:hover { background:#5a4bd6; }
+    .dev-table .btn-devolver-todo { background:#22c55e; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px; }
+    .dev-table .btn-devolver-todo:hover { background:#16a34a; }
+
+    .doc-numero { background:#2d2d44; padding:2px 8px; border-radius:4px; font-size:11px; color:#6c5ce7; }
+
+    .dias-ok { color:#22c55e; font-weight:bold; }
+    .dias-alerta { color:#f59e0b; font-weight:bold; }
+    .dias-vencido { color:#ef4444; font-weight:bold; background:rgba(239,68,68,0.1); padding:2px 6px; border-radius:4px; }
+
+    .badge { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; border-radius:10px; font-size:11px; font-weight:bold; padding:0 6px; }
+    .badge-warning { background:#f59e0b; color:#000; }
+    .badge-danger { background:#ef4444; color:#fff; }
+
+    /* Modal */
+    .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal-card-wide { background:#1a1a2e; border-radius:12px; padding:24px; width:95%; max-width:800px; max-height:90vh; overflow-y:auto; }
+    .modal-card-wide h3 { margin-bottom:16px; }
+    .modal-info { display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; margin-bottom:16px; font-size:13px; }
+    .modal-info .info-label { color:#9ca3af; font-size:11px; }
+    .modal-info .info-value { color:#fff; }
+    .modal-table { width:100%; border-collapse:collapse; font-size:13px; margin-bottom:16px; }
+    .modal-table th, .modal-table td { padding:8px 10px; border-bottom:1px solid #2d2d44; text-align:left; }
+    .modal-table th { color:#9ca3af; font-size:11px; text-transform:uppercase; }
+    .modal-table input[type="number"] { width:80px; padding:4px 8px; border:1px solid #333; border-radius:4px; background:#111; color:#fff; font-size:12px; }
+    .modal-table input[type="number"].input-error { border-color:#ef4444; }
+    .modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+    .modal-actions button { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-size:13px; }
+    .btn-confirmar { background:#6c5ce7; color:#fff; }
+    .btn-confirmar:hover { background:#5a4bd6; }
+    .btn-cancelar { background:#333; color:#fff; }
+    .btn-cancelar:hover { background:#444; }
+
+    /* Toggle premium */
+    .toggle-premium { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; margin-bottom:12px; }
+    .toggle-premium input { display:none; }
+    .toggle-premium .slider { width:40px; height:20px; background:#555; border-radius:20px; position:relative; transition:0.15s ease; }
+    .toggle-premium input:checked + .slider { background:#4ade80; }
+    .toggle-premium .slider::after { content:""; width:16px; height:16px; background:#ddd; border-radius:50%; position:absolute; top:2px; left:2px; transition:0.15s ease; }
+    .toggle-premium input:checked + .slider::after { left:22px; background:white; }
+    .toggle-premium .label { font-size:14px; color:#ccc; }
+
+    /* Select motivo en modal */
+    .select-motivo { padding:4px 8px; border:1px solid #333; border-radius:4px; background:#111; color:#fff; font-size:11px; min-width:120px; }
+    .select-motivo:focus { border-color:#6c5ce7; outline:none; }
+
+    /* Badges de motivo */
+    .badge-motivo { display:inline-block; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:bold; }
+    .badge-motivo.devuelto { background:rgba(34,197,94,0.2); color:#22c55e; }
+    .badge-motivo.consumido { background:rgba(59,130,246,0.2); color:#3b82f6; }
+    .badge-motivo.extraviado { background:rgba(249,115,22,0.2); color:#f97316; }
+    .badge-motivo.danado_baja { background:rgba(239,68,68,0.2); color:#ef4444; }
+    .badge-motivo.danado_reparacion { background:rgba(234,179,8,0.2); color:#eab308; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 30px;">
+        <header class="topbar">
+          <h1><i class="fa fa-rotate-left"></i> Devoluciones / Materiales Fuera</h1>
+          <div class="top-actions">
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <section class="cards-resumen">
+          <div class="card-resumen alerta">
+            <div class="valor" id="kpi-materiales-fuera">0</div>
+            <div class="label"><i class="fa fa-box-open"></i> Materiales fuera</div>
+          </div>
+          <div class="card-resumen peligro">
+            <div class="valor" id="kpi-vencidos">0</div>
+            <div class="label"><i class="fa fa-clock"></i> Vencidos</div>
+          </div>
+          <div class="card-resumen info">
+            <div class="valor" id="kpi-dias-promedio">0</div>
+            <div class="label"><i class="fa fa-calendar-days"></i> Días promedio fuera</div>
+          </div>
+          <div class="card-resumen ok">
+            <div class="valor" id="kpi-devoluciones-hoy">0</div>
+            <div class="label"><i class="fa fa-check-circle"></i> Devoluciones hoy</div>
+          </div>
+        </section>
+
+        <!-- Filtros -->
+        <section class="filtros-bar">
+          <input type="text" id="filtro-busqueda" placeholder="Buscar por documento, producto, obra...">
+          <select id="filtro-tipo">
+            <option value="">Todos los tipos</option>
+            <option value="Traslado">Traslado</option>
+            <option value="Requisición de materiales">Requisición de materiales</option>
+            <option value="Requisición de herramienta">Requisición de herramienta</option>
+          </select>
+          <select id="filtro-estado">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="vencido">Vencido</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+          <input type="date" id="filtro-fecha-desde" title="Fecha desde">
+          <input type="date" id="filtro-fecha-hasta" title="Fecha hasta">
+          <input type="number" id="filtro-dias-min" placeholder="Días mín" min="0" title="Días fuera mínimo">
+          <input type="number" id="filtro-dias-max" placeholder="Días máx" min="0" title="Días fuera máximo">
+        </section>
+
+        <!-- Toggle documentos cerrados -->
+        <label class="toggle-premium">
+          <input type="checkbox" id="toggleCerrados">
+          <span class="slider"></span>
+          <span class="label">Mostrar documentos cerrados</span>
+        </label>
+
+        <!-- Tabla de materiales fuera -->
+        <section class="historial">
+          <table class="dev-table" id="tabla-materiales">
+            <thead>
+              <tr>
+                <th>Documento</th>
+                <th>Obra/Destino</th>
+                <th>Producto</th>
+                <th style="text-align:center;">Salió</th>
+                <th style="text-align:center;">Devuelto</th>
+                <th style="text-align:center;">Pendiente</th>
+                <th style="text-align:center;">Días fuera</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="materialesFueraBody">
+              <tr><td colspan="9" style="text-align:center;color:#9ca3af;">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de Devolución -->
+  <div class="modal-overlay" id="modal-devolucion">
+    <div class="modal-card-wide">
+      <h3><i class="fa fa-rotate-left"></i> Registrar Devolución</h3>
+      <div class="modal-info" id="modal-doc-info">
+        <div>
+          <div class="info-label">Documento</div>
+          <div class="info-value" id="modal-doc-numero">-</div>
+        </div>
+        <div>
+          <div class="info-label">Tipo</div>
+          <div class="info-value" id="modal-doc-tipo">-</div>
+        </div>
+        <div>
+          <div class="info-label">Proyecto/Obra</div>
+          <div class="info-value" id="modal-doc-proyecto">-</div>
+        </div>
+        <div>
+          <div class="info-label">Fecha</div>
+          <div class="info-value" id="modal-doc-fecha">-</div>
+        </div>
+      </div>
+      <table class="modal-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th style="text-align:center;">Salió</th>
+            <th style="text-align:center;">Devuelto</th>
+            <th style="text-align:center;">Pendiente</th>
+            <th style="text-align:center;">Devolver ahora</th>
+            <th style="text-align:center;">Motivo</th>
+          </tr>
+        </thead>
+        <tbody id="modal-productos-body">
+          <tr><td colspan="6" style="text-align:center;color:#9ca3af;">Cargando productos...</td></tr>
+        </tbody>
+      </table>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancelar" id="btn-cancelar-modal">Cancelar</button>
+        <button type="button" class="btn-confirmar" id="btn-confirmar-devolucion"><i class="fa fa-check"></i> Confirmar Devolución</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script type="module" src="./devoluciones.controller.js"></script>
+  <script>function logout(){window.location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

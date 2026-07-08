@@ -1,0 +1,21 @@
+{
+  "enabled": true,
+  "name": "Auto-analyze images on creation",
+  "description": "Automatically analyze images when created in the project",
+  "version": "1",
+  "when": {
+    "type": "fileCreated",
+    "patterns": [
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.gif",
+      "*.svg",
+      "*.webp"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze this newly created image file and provide insights about its content, purpose, and any technical details visible. Focus on UI designs, architecture diagrams, or technical schematics."
+  }
+}

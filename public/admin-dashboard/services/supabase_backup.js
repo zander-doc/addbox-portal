@@ -1,0 +1,10 @@
+// 🔄 Reemplazado por supabase-client.js
+/*
+// services/supabase.js
+const SUPABASE_URL = "https://billwldqxupcavzurljo.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpbGx3bGRxeHVwY2F2enVybGpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNDAzODIsImV4cCI6MjA5MTgxNjM4Mn0.4jsINbwwL9RMjKMdnQu-nYM7qBLb9KIXhEsuXQrEGO8";
+
+export const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+console.log("🔥 Supabase cliente exportado correctamente:", supabase);
+*/

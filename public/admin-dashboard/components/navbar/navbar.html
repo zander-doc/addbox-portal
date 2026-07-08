@@ -1,0 +1,26 @@
+<header class="app-navbar">
+  <!-- Auth Guard -->
+  <script type="module">
+    import { requireSession } from "../services/auth-guard.js";
+    await requireSession();
+  </script>
+  <div class="app-navbar-left">
+    <div class="app-navbar-title">Dashboard</div>
+  </div>
+
+  <div class="app-navbar-right">
+
+    <!-- Botón dark mode -->
+    <button id="btn-toggle-theme" title="Cambiar tema">🌓</button>
+
+    <!-- Usuario -->
+    <div class="app-navbar-user">
+      <div style="width:24px;height:24px;border-radius:999px;background:#e5e7eb;"></div>
+      <div style="font-size:13px;">
+        <div>Alexander</div>
+        <div style="font-size:11px;color:var(--text-muted);">Administrador</div>
+      </div>
+    </div>
+
+  </div>
+</header>

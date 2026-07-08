@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Contratación — RRHH ADDBOX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .pipeline { display: flex; gap: 16px; margin-top: 20px; overflow-x: auto; }
+    .pipeline-col { min-width: 220px; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.08); }
+    .pipeline-col h4 { font-size: 0.8rem; color: #9ca3af; margin-bottom: 12px; text-transform: uppercase; }
+    .candidate-card { background: rgba(255,255,255,0.06); border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.06); }
+    .candidate-card .name { font-weight: 600; font-size: 0.85rem; }
+    .candidate-card .role { font-size: 0.75rem; color: #9ca3af; }
+    .ai-score { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; background: linear-gradient(135deg, #6c5ce7, #a855f7); color: #fff; margin-top: 6px; }
+    .back-link { color: #8ab4ff; text-decoration: none; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <main class="content" style="padding: 24px;">
+      <a href="rrhh.html" class="back-link">← Volver a RRHH</a>
+      <h1 style="margin-top:12px;">📋 Contratación <span style="font-size:0.6em; background:linear-gradient(135deg,#6c5ce7,#a855f7); padding:3px 10px; border-radius:20px; color:#fff;">IA</span></h1>
+      <p style="color:#9ca3af; margin-top:8px;">Pipeline de candidatos con scoring inteligente</p>
+
+      <div class="pipeline">
+        <div class="pipeline-col">
+          <h4>Aplicados (5)</h4>
+          <div class="candidate-card"><div class="name">Roberto Díaz</div><div class="role">Electricista</div><span class="ai-score">IA: 92%</span></div>
+          <div class="candidate-card"><div class="name">Laura Méndez</div><div class="role">Técnico HVAC</div><span class="ai-score">IA: 87%</span></div>
+          <div class="candidate-card"><div class="name">Jorge Ruiz</div><div class="role">Soldador</div><span class="ai-score">IA: 78%</span></div>
+        </div>
+        <div class="pipeline-col">
+          <h4>Entrevista (2)</h4>
+          <div class="candidate-card"><div class="name">Ana Torres</div><div class="role">Ing. Civil</div><span class="ai-score">IA: 95%</span></div>
+          <div class="candidate-card"><div class="name">Miguel Flores</div><div class="role">Almacenista</div><span class="ai-score">IA: 84%</span></div>
+        </div>
+        <div class="pipeline-col">
+          <h4>Oferta (1)</h4>
+          <div class="candidate-card"><div class="name">Patricia Vega</div><div class="role">Supervisora</div><span class="ai-score">IA: 98%</span></div>
+        </div>
+        <div class="pipeline-col">
+          <h4>Contratados (1)</h4>
+          <div class="candidate-card"><div class="name">Fernando López</div><div class="role">Plomero Sr.</div><span class="ai-score">IA: 91%</span></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>function logout(){location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

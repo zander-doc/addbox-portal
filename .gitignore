@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+package-lock.json
+yarn.lock
+
+# Variables de entorno (NUNCA subir credenciales)
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editores
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos comprimidos
+*.rar
+*.zip
+*.7z
+
+# Archivos temporales
+*.tmp
+*.temp
+dist/
+build/

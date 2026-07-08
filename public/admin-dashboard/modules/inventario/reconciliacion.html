@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Control de Inventario — ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       CONTROL DE INVENTARIO — DISEÑO PREMIUM
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Tabs de navegación */
+    .ci-tabs {
+      display: flex;
+      gap: 4px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+    .ci-tab {
+      padding: 10px 20px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #9ca3af;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      background: transparent;
+    }
+    .ci-tab:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .ci-tab.active {
+      background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(108,92,231,0.3);
+    }
+    .ci-tab i { font-size: 12px; }
+
+    /* Paneles */
+    .ci-panel { display: none; }
+    .ci-panel.active { display: block; }
+
+    /* KPI Cards */
+    .ci-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .ci-kpi {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.2s ease;
+    }
+    .ci-kpi:hover {
+      background: rgba(255,255,255,0.06);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+    .ci-kpi-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: #fff; flex-shrink: 0;
+    }
+    .ci-kpi-value { font-size: 22px; font-weight: 800; color: #fff; }
+    .ci-kpi-label { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .ci-kpi-change { font-size: 11px; margin-top: 2px; font-weight: 600; }
+    .ci-kpi-change.up { color: #22c55e; }
+    .ci-kpi-change.down { color: #ef4444; }
+
+    /* Panorama de Obras */
+    .ci-obras-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .ci-obra-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      padding-top: 22px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .ci-obra-card:hover {
+      background: rgba(255,255,255,0.07);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    .ci-obra-card.activa::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #00cec9, #55efc4);
+    }
+    .ci-obra-card.inactiva { opacity: 0.55; }
+    .ci-obra-card.inactiva::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #636e72, #b2bec3);
+    }
+    .ci-obra-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; padding-right: 80px; }
+    .ci-obra-dir { font-size: 11px; color: #9ca3af; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ci-obra-dir i { color: #6c5ce7; margin-right: 4px; }
+    .ci-obra-stats { display: flex; gap: 16px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .ci-obra-stat { text-align: center; }
+    .ci-obra-stat-val { font-size: 15px; font-weight: 700; color: #fff; }
+    .ci-obra-stat-lbl { font-size: 10px; color: #9ca3af; text-transform: uppercase; }
+    .ci-obra-badge {
+      position: absolute; top: 12px; right: 12px;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+    }
+    .ci-obra-badge.ok { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .ci-obra-badge.pendiente { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .ci-obra-badge.inactiva { background: rgba(99,110,114,0.2); color: #b2bec3; }
+
+    /* Sección colapsable */
+    .ci-collapse-toggle {
+      font-size: 12px; color: #636e72; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      margin: 14px 0 10px; user-select: none;
+    }
+    .ci-collapse-toggle:hover { color: #b2bec3; }
+    .ci-collapse-toggle i { transition: transform 0.2s; font-size: 10px; }
+
+    /* Auditoría Rápida */
+    .ci-audit-workspace {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .ci-audit-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px;
+    }
+    .ci-audit-title {
+      font-size: 16px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ci-audit-title i { color: #6c5ce7; }
+    .ci-audit-select {
+      padding: 10px 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      color: #fff; font-size: 14px; min-width: 260px;
+    }
+    .ci-audit-select:focus { outline: none; border-color: #6c5ce7; box-shadow: 0 0 0 3px rgba(108,92,231,0.15); }
+
+    /* Tabla de auditoría */
+    .ci-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    .ci-table th {
+      padding: 12px 14px; text-align: left; font-size: 11px;
+      text-transform: uppercase; color: #9ca3af;
+      border-bottom: 1px solid rgba(255,255,255,0.08); letter-spacing: 0.5px;
+    }
+    .ci-table td {
+      padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #ddd;
+    }
+    .ci-table tr:hover { background: rgba(255,255,255,0.03); }
+    .ci-table input[type="number"] {
+      width: 90px; padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+      background: rgba(255,255,255,0.04); color: #fff;
+      font-size: 14px; text-align: right; transition: all 0.2s;
+    }
+    .ci-table input[type="number"]:focus {
+      outline: none; border-color: #6c5ce7;
+      box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+    }
+
+    /* Diferencias inline */
+    .diff-pos { color: #22c55e; font-weight: 700; }
+    .diff-neg { color: #ef4444; font-weight: 700; }
+    .diff-zero { color: #636e72; }
+
+    /* Impacto card */
+    .ci-impact-bar {
+      display: flex; gap: 16px; margin: 16px 0;
+      padding: 16px; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+    }
+    .ci-impact-item { text-align: center; flex: 1; }
+    .ci-impact-val { font-size: 18px; font-weight: 800; color: #fff; }
+    .ci-impact-lbl { font-size: 11px; color: #9ca3af; }
+
+    /* Botones premium */
+    .ci-btn {
+      padding: 10px 20px; border: none; border-radius: 10px;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
+    }
+    .ci-btn-primary { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: #fff; }
+    .ci-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(108,92,231,0.4); }
+    .ci-btn-success { background: linear-gradient(135deg, #22c55e, #4ade80); color: #fff; }
+    .ci-btn-success:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34,197,94,0.4); }
+    .ci-btn-danger { background: linear-gradient(135deg, #ef4444, #f87171); color: #fff; }
+    .ci-btn-danger:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239,68,68,0.4); }
+    .ci-btn-ghost {
+      background: rgba(255,255,255,0.05); color: #9ca3af;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .ci-btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* Historial timeline */
+    .ci-timeline { list-style: none; padding: 0; margin: 0; }
+    .ci-timeline-item {
+      display: flex; gap: 14px; padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .ci-timeline-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      margin-top: 5px; flex-shrink: 0;
+    }
+    .ci-timeline-dot.ajuste { background: #6c5ce7; }
+    .ci-timeline-dot.alerta { background: #f59e0b; }
+    .ci-timeline-content { flex: 1; }
+    .ci-timeline-title { font-size: 13px; color: #fff; font-weight: 600; }
+    .ci-timeline-meta { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+
+    /* Charts */
+    .ci-chart-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px; padding: 18px; margin-bottom: 16px;
+    }
+    .ci-chart-title { font-size: 13px; color: #9ca3af; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Top productos */
+    .ci-top-list { list-style: none; padding: 0; margin: 0; }
+    .ci-top-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .ci-top-rank {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+      background: rgba(108,92,231,0.2);
+    }
+    .ci-top-name { flex: 1; font-size: 13px; color: #ddd; }
+    .ci-top-val { font-size: 13px; font-weight: 700; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .ci-kpis { grid-template-columns: repeat(2, 1fr); }
+      .ci-obras-grid { grid-template-columns: repeat(2, 1fr); }
+      .ci-tabs { flex-wrap: wrap; }
+    }
+    @media (max-width: 600px) {
+      .ci-kpis { grid-template-columns: 1fr; }
+      .ci-obras-grid { grid-template-columns: 1fr; }
+      .ci-audit-workspace { padding: 16px; }
+      .ci-tab { padding: 8px 14px; font-size: 12px; }
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 24px;">
+
+        <!-- HEADER -->
+        <header class="topbar">
+          <h1><i class="fa fa-shield-halved" style="color:#6c5ce7;"></i> Control de Inventario</h1>
+          <div class="top-actions">
+            <button class="logout-btn" id="btnLogout"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- TABS -->
+        <nav class="ci-tabs">
+          <button class="ci-tab active" data-tab="salud"><i class="fa fa-heart-pulse"></i> Salud</button>
+          <button class="ci-tab" data-tab="auditoria"><i class="fa fa-clipboard-check"></i> Por Obra</button>
+          <button class="ci-tab" data-tab="general"><i class="fa fa-boxes-stacked"></i> General</button>
+          <button class="ci-tab" data-tab="historial"><i class="fa fa-clock-rotate-left"></i> Historial</button>
+          <button class="ci-tab" data-tab="impacto"><i class="fa fa-chart-line"></i> Impacto</button>
+        </nav>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB 1: SALUD DEL INVENTARIO                            -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="ci-panel active" id="panel-salud">
+
+          <!-- KPIs -->
+          <section class="ci-kpis">
+            <div class="ci-kpi">
+              <div class="ci-kpi-icon" style="background:linear-gradient(135deg,#22c55e,#4ade80);"><i class="fa fa-bullseye"></i></div>
+              <div>
+                <div class="ci-kpi-value" id="kpiPrecision">—%</div>
+                <div class="ci-kpi-label">Precisión del inventario</div>
+              </div>
+            </div>
+            <div class="ci-kpi">
+              <div class="ci-kpi-icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);"><i class="fa fa-dollar-sign"></i></div>
+              <div>
+                <div class="ci-kpi-value" id="kpiValorTotal">—</div>
+                <div class="ci-kpi-label">Valor del inventario</div>
+              </div>
+            </div>
+            <div class="ci-kpi">
+              <div class="ci-kpi-icon" style="background:linear-gradient(135deg,#00cec9,#55efc4);"><i class="fa fa-hard-hat"></i></div>
+              <div>
+                <div class="ci-kpi-value" id="kpiObrasActivas">—</div>
+                <div class="ci-kpi-label">Obras activas</div>
+              </div>
+            </div>
+            <div class="ci-kpi">
+              <div class="ci-kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);"><i class="fa fa-triangle-exclamation"></i></div>
+              <div>
+                <div class="ci-kpi-value" id="kpiPendientes">—</div>
+                <div class="ci-kpi-label">Obras sin auditar (30d)</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Panorama de Obras -->
+          <section>
+            <h3 style="font-size:14px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+              <i class="fa fa-building" style="color:#00cec9;"></i> Obras en Ejecución
+            </h3>
+            <div class="ci-obras-grid" id="obrasActivasGrid">
+              <div style="color:#9ca3af;font-size:13px;padding:16px;">Cargando...</div>
+            </div>
+
+            <div class="ci-collapse-toggle" id="toggleInactivas" style="display:none;" onclick="toggleInactivas()">
+              <i class="fa fa-chevron-right" id="chevronInact"></i>
+              <span>Obras inactivas (<span id="countInactivas">0</span>)</span>
+            </div>
+            <div class="ci-obras-grid hidden" id="obrasInactivasGrid"></div>
+          </section>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB 2: AUDITORÍA RÁPIDA                                -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="ci-panel" id="panel-auditoria">
+          <div class="ci-audit-workspace">
+            <div class="ci-audit-header">
+              <div class="ci-audit-title"><i class="fa fa-clipboard-check"></i> Auditoría Rápida</div>
+              <select class="ci-audit-select" id="auditSelectObra">
+                <option value="">Seleccionar obra...</option>
+              </select>
+            </div>
+
+            <!-- Impacto en tiempo real -->
+            <div class="ci-impact-bar hidden" id="auditImpactBar">
+              <div class="ci-impact-item">
+                <div class="ci-impact-val" id="impactProductos">0</div>
+                <div class="ci-impact-lbl">Productos con diferencia</div>
+              </div>
+              <div class="ci-impact-item">
+                <div class="ci-impact-val diff-neg" id="impactFaltantes">0</div>
+                <div class="ci-impact-lbl">Unidades faltantes</div>
+              </div>
+              <div class="ci-impact-item">
+                <div class="ci-impact-val diff-pos" id="impactSobrantes">0</div>
+                <div class="ci-impact-lbl">Unidades sobrantes</div>
+              </div>
+              <div class="ci-impact-item">
+                <div class="ci-impact-val" id="impactValor">$0</div>
+                <div class="ci-impact-lbl">Impacto en valor</div>
+              </div>
+            </div>
+
+            <!-- Tabla de auditoría -->
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-top:16px;">
+              <table class="ci-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Stock Sistema</th>
+                    <th>Conteo Real</th>
+                    <th>Diferencia</th>
+                  </tr>
+                </thead>
+                <tbody id="auditTableBody">
+                  <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:30px;">Selecciona una obra para iniciar la auditoría</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Acciones -->
+            <div style="display:flex;gap:10px;margin-top:16px;" id="auditActions" class="hidden">
+              <button class="ci-btn ci-btn-success" id="btnAplicarAjustes"><i class="fa fa-check"></i> Aplicar ajustes</button>
+              <button class="ci-btn ci-btn-ghost" id="btnLimpiarAudit"><i class="fa fa-eraser"></i> Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB 3: AUDITORÍA GENERAL                               -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="ci-panel" id="panel-general">
+          <div class="ci-audit-workspace">
+            <div class="ci-audit-header">
+              <div class="ci-audit-title"><i class="fa fa-boxes-stacked"></i> Auditoría General del Inventario</div>
+              <div style="display:flex;gap:10px;">
+                <button class="ci-btn ci-btn-ghost" id="btnFiltrarDiscrepancias"><i class="fa fa-filter"></i> Solo discrepancias</button>
+                <button class="ci-btn ci-btn-success hidden" id="btnSincronizarTodo"><i class="fa fa-sync"></i> Sincronizar todo</button>
+              </div>
+            </div>
+
+            <p style="font-size:12px;color:#9ca3af;margin:0 0 16px;">
+              Compara el campo <strong>existencia</strong> de cada producto contra la suma real distribuida en obras (<strong>stock_obra</strong>). Las discrepancias indican datos desincronizados.
+            </p>
+
+            <!-- Resumen rápido -->
+            <div class="ci-impact-bar" id="generalResumen">
+              <div class="ci-impact-item">
+                <div class="ci-impact-val" id="genTotalProductos">—</div>
+                <div class="ci-impact-lbl">Productos</div>
+              </div>
+              <div class="ci-impact-item">
+                <div class="ci-impact-val diff-pos" id="genCoinciden">—</div>
+                <div class="ci-impact-lbl">Coinciden</div>
+              </div>
+              <div class="ci-impact-item">
+                <div class="ci-impact-val diff-neg" id="genDiscrepancias">—</div>
+                <div class="ci-impact-lbl">Discrepancias</div>
+              </div>
+              <div class="ci-impact-item">
+                <div class="ci-impact-val" id="genPrecision">—%</div>
+                <div class="ci-impact-lbl">Precisión</div>
+              </div>
+            </div>
+
+            <!-- Tabla -->
+            <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-top:16px;">
+              <table class="ci-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Existencia (registro)</th>
+                    <th>Stock Real (obras)</th>
+                    <th>Diferencia</th>
+                    <th>Costo Unit.</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="generalTableBody">
+                  <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:30px;">Cargando auditoría general...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB 4: HISTORIAL                                       -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="ci-panel" id="panel-historial">
+          <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+            <select class="ci-audit-select" id="historialFiltroObra" style="min-width:200px;">
+              <option value="">Todas las obras</option>
+            </select>
+            <select class="ci-audit-select" id="historialFiltroPeriodo" style="min-width:160px;">
+              <option value="7">Últimos 7 días</option>
+              <option value="30" selected>Últimos 30 días</option>
+              <option value="90">Últimos 90 días</option>
+              <option value="365">Último año</option>
+            </select>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;">
+            <table class="ci-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Obra</th>
+                  <th>Producto</th>
+                  <th>Ajuste</th>
+                  <th>Motivo</th>
+                </tr>
+              </thead>
+              <tbody id="historialTableBody">
+                <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:30px;">Cargando historial...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB 4: ANÁLISIS DE IMPACTO                             -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div class="ci-panel" id="panel-impacto">
+          <!-- KPIs de impacto -->
+          <section class="ci-kpis" style="margin-bottom:20px;">
+            <div class="ci-kpi">
+              <div class="ci-kpi-icon" style="background:linear-gradient(135deg,#ef4444,#f87171);"><i class="fa fa-arrow-down"></i></div>
+              <div>
+                <div class="ci-kpi-value diff-neg" id="impTotalFaltantes">—</div>
+                <div class="ci-kpi-label">Total faltantes (30d)</div>
+              </div>
+            </div>
+            <div class="ci-kpi">
+              <div class="ci-kpi-icon" style="background:linear-gradient(135deg,#22c55e,#4ade80);"><i class="fa fa-arrow-up"></i></div>
+              <div>
+                <div class="ci-kpi-value diff-pos" id="impTotalSobrantes">—</div>
+                <div class="ci-kpi-label">Total sobrantes (30d)</div>
+              </div>
+            </div>
+            <div class="ci-kpi">
+              <div class="ci-kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);"><i class="fa fa-coins"></i></div>
+              <div>
+                <div class="ci-kpi-value" id="impValorPerdido">—</div>
+                <div class="ci-kpi-label">Valor perdido estimado</div>
+              </div>
+            </div>
+            <div class="ci-kpi">
+              <div class="ci-kpi-icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);"><i class="fa fa-hashtag"></i></div>
+              <div>
+                <div class="ci-kpi-value" id="impTotalAjustes">—</div>
+                <div class="ci-kpi-label">Ajustes realizados (30d)</div>
+              </div>
+            </div>
+          </section>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <!-- Top faltantes -->
+            <div class="ci-chart-card">
+              <div class="ci-chart-title"><i class="fa fa-arrow-trend-down" style="color:#ef4444;"></i> Top Productos con Faltantes</div>
+              <ul class="ci-top-list" id="topFaltantes">
+                <li style="color:#9ca3af;font-size:12px;padding:10px;">Cargando...</li>
+              </ul>
+            </div>
+            <!-- Top sobrantes -->
+            <div class="ci-chart-card">
+              <div class="ci-chart-title"><i class="fa fa-arrow-trend-up" style="color:#22c55e;"></i> Top Productos con Sobrantes</div>
+              <ul class="ci-top-list" id="topSobrantes">
+                <li style="color:#9ca3af;font-size:12px;padding:10px;">Cargando...</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Gráfica de ajustes por obra -->
+          <div class="ci-chart-card" style="margin-top:16px;">
+            <div class="ci-chart-title"><i class="fa fa-chart-bar" style="color:#6c5ce7;"></i> Discrepancias por Obra</div>
+            <div id="chartDiscrepancias" style="height:280px;"></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script type="module" src="./reconciliacion.controller.js"></script>
+</body>
+</html>

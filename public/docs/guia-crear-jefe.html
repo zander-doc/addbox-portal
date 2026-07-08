@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Guía: Crear Cuenta del Jefe — ADDBOX LLC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      line-height: 1.7;
+    }
+    .guide-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    .guide-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .guide-header h1 {
+      font-size: 2rem;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+    .guide-header p {
+      color: #666;
+      font-size: 1.05rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    .badge-time { background: #e3f2fd; color: #1565c0; }
+    .step {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border-left: 5px solid #6c5ce7;
+    }
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      background: #6c5ce7;
+      color: #fff;
+      border-radius: 50%;
+      font-weight: 700;
+      margin-right: 12px;
+    }
+    .step h2 { display: inline; font-size: 1.3rem; vertical-align: middle; }
+    .step p { margin-top: 12px; color: #444; }
+</style>
+  <style>
+    .step-url {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #1a1a2e;
+      color: #00d2ff;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      word-break: break-all;
+    }
+    .mockup {
+      margin-top: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fafafa;
+    }
+    .mockup-bar {
+      background: #e0e0e0;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    .mockup-url {
+      margin-left: 12px;
+      font-size: 0.75rem;
+      color: #666;
+      font-family: monospace;
+    }
+    .mockup-body { padding: 32px; text-align: center; }
+    .mockup-card {
+      max-width: 420px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: left;
+    }
+    .mockup-card h3 { font-size: 1.1rem; margin-bottom: 8px; color: #1a1a2e; }
+    .mockup-card p { font-size: 0.85rem; color: #666; margin-bottom: 16px; }
+    .mock-input {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid #ddd; border-radius: 6px;
+      font-size: 0.85rem; margin-bottom: 12px;
+      background: #f9f9f9; color: #333;
+    }
+    .mock-btn {
+      display: block; width: 100%; padding: 11px;
+      border: none; border-radius: 6px;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: default; margin-top: 8px;
+    }
+    .mock-btn-purple { background: #6c5ce7; color: #fff; }
+    .mock-btn-green { background: #00b894; color: #fff; }
+  </style>
+  <style>
+    .mock-key-display {
+      background: #1a1a2e; color: #00d2ff;
+      padding: 14px; border-radius: 6px;
+      font-family: monospace; font-size: 0.8rem;
+      word-break: break-all; margin: 12px 0;
+    }
+    .mock-success {
+      background: #d4edda; color: #155724;
+      padding: 10px 14px; border-radius: 6px;
+      font-size: 0.85rem; margin-top: 12px;
+      border: 1px solid #c3e6cb;
+    }
+    .mock-warning {
+      background: #fff3cd; color: #856404;
+      padding: 10px 14px; border-radius: 6px;
+      font-size: 0.8rem; margin-bottom: 16px;
+      border: 1px solid #ffc107;
+    }
+    .mock-label {
+      font-size: 0.8rem; font-weight: 600;
+      color: #333; margin-bottom: 4px; display: block;
+    }
+    .flow-diagram {
+      background: #fff; border-radius: 16px;
+      padding: 32px; margin-bottom: 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .flow-diagram h2 { text-align: center; margin-bottom: 24px; font-size: 1.3rem; }
+    .flow-steps {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+    }
+    .flow-item {
+      background: #f8f9fa; border: 2px solid #6c5ce7;
+      border-radius: 10px; padding: 14px 24px;
+      text-align: center; min-width: 300px; font-size: 0.9rem;
+    }
+    .flow-item.dev { border-color: #0984e3; background: #e3f2fd; }
+    .flow-item.jefe { border-color: #00b894; background: #e8f8f5; }
+    .flow-item.system { border-color: #6c5ce7; background: #f3f0ff; }
+    .flow-arrow { font-size: 1.5rem; color: #999; padding: 4px 0; }
+    .trouble-table {
+      width: 100%; border-collapse: collapse; margin-top: 16px;
+    }
+    .trouble-table th, .trouble-table td {
+      padding: 12px 16px; text-align: left;
+      border-bottom: 1px solid #eee; font-size: 0.85rem;
+    }
+    .trouble-table th { background: #f8f9fa; font-weight: 600; color: #333; }
+    .trouble-table td:first-child { color: #d63031; font-weight: 500; }
+    .guide-footer { text-align: center; padding: 24px; color: #999; font-size: 0.8rem; }
+    @media (max-width: 600px) {
+      .guide-container { padding: 20px 16px; }
+      .step { padding: 20px; }
+      .mockup-body { padding: 16px; }
+      .flow-item { min-width: auto; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="guide-container">
+    <div class="guide-header">
+      <h1>📖 Guía: Crear Cuenta del Jefe</h1>
+      <p>Instrucciones paso a paso para configurar la primera cuenta administrativa de ADDBOX LLC</p>
+      <span class="badge badge-time">⏱️ Tiempo estimado: 5 minutos</span>
+    </div>
+
+    <!-- PASO 1 -->
+    <div class="step">
+      <span class="step-number">1</span>
+      <h2>Generar la Master Key</h2>
+      <p>El <strong>desarrollador</strong> debe generar una clave maestra que será entregada al jefe/dueño para crear su cuenta.</p>
+      <code class="step-url">/admin-dashboard/setup/dev-master-key.html</code>
+      <div class="mockup">
+        <div class="mockup-bar">
+          <span class="mockup-dot dot-red"></span>
+          <span class="mockup-dot dot-yellow"></span>
+          <span class="mockup-dot dot-green"></span>
+          <span class="mockup-url">localhost/admin-dashboard/setup/dev-master-key.html</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-card">
+            <h3>🔑 Generar Master Key (Desarrollador)</h3>
+            <p>Esta clave se usará una sola vez para que el jefe cree su cuenta.</p>
+            <div class="mock-warning">⚠️ <strong>Importante:</strong> Esta clave no se puede recuperar después de cerrar esta página.</div>
+            <button class="mock-btn mock-btn-purple">Generar Master Key</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- PASO 2 -->
+    <div class="step">
+      <span class="step-number">2</span>
+      <h2>Guardar la Master Key</h2>
+      <p>Después de hacer clic en "Generar", aparecerá la clave. <strong>Debes guardarla inmediatamente</strong> porque no se puede recuperar.</p>
+      <div class="mockup">
+        <div class="mockup-bar">
+          <span class="mockup-dot dot-red"></span>
+          <span class="mockup-dot dot-yellow"></span>
+          <span class="mockup-dot dot-green"></span>
+          <span class="mockup-url">localhost/admin-dashboard/setup/dev-master-key.html</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-card">
+            <h3>✅ Master Key Generada</h3>
+            <div class="mock-key-display">ADDBOX-OWNER-a3f2b1c4-d5e6f7a8-b9c0d1e2-f3a4b5c6</div>
+            <button class="mock-btn mock-btn-green">📥 Descargar como archivo (.key)</button>
+            <p style="margin-top:12px; font-size:0.8rem; color:#666;">Después de generar la clave, puedes ir a <u>crear la cuenta del jefe</u>.</p>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:16px;"><strong>Opciones para guardar:</strong></p>
+      <ul style="margin-top:8px; padding-left:20px; color:#444; font-size:0.9rem;">
+        <li>📥 Hacer clic en "Descargar" → se guarda como <code>addbox-owner.key</code></li>
+        <li>📋 Seleccionar la clave y copiar (Ctrl+C) → pegar en lugar seguro</li>
+        <li>📸 Tomar captura de pantalla como respaldo</li>
+      </ul>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="step">
+      <span class="step-number">3</span>
+      <h2>Entregar la Master Key al Jefe</h2>
+      <p>El desarrollador entrega la clave al jefe/dueño de la empresa. Métodos recomendados:</p>
+      <ul style="margin-top:12px; padding-left:20px; color:#444; font-size:0.9rem;">
+        <li>🤝 En persona (más seguro)</li>
+        <li>🔒 Por mensaje cifrado (Signal, WhatsApp con desaparición)</li>
+        <li>📧 Por email (menos seguro, pero funcional)</li>
+        <li>📁 Compartir el archivo .key por medio seguro</li>
+      </ul>
+    </div>
+    <!-- PASO 4 -->
+    <div class="step">
+      <span class="step-number">4</span>
+      <h2>Crear la Cuenta del Jefe</h2>
+      <p>El <strong>jefe/dueño</strong> accede a la página de creación de cuenta e ingresa sus datos junto con la master key.</p>
+      <code class="step-url">/admin-dashboard/crear-jefe.html</code>
+      <div class="mockup">
+        <div class="mockup-bar">
+          <span class="mockup-dot dot-red"></span>
+          <span class="mockup-dot dot-yellow"></span>
+          <span class="mockup-dot dot-green"></span>
+          <span class="mockup-url">localhost/admin-dashboard/crear-jefe.html</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-card">
+            <h3>👤 Crear cuenta del Jefe</h3>
+            <p>Introduce tus datos y la master key que te entregó el desarrollador.</p>
+            <span class="mock-label">Nombre completo</span>
+            <div class="mock-input">Carlos Rodríguez</div>
+            <span class="mock-label">Correo electrónico</span>
+            <div class="mock-input">carlos@addbox.com</div>
+            <span class="mock-label">Contraseña</span>
+            <div class="mock-input">••••••••••</div>
+            <span class="mock-label">Master Key</span>
+            <div class="mock-input" style="font-family:monospace; font-size:0.75rem;">ADDBOX-OWNER-a3f2b1c4-d5e6f7a8-b9c0d1e2-f3a4b5c6</div>
+            <button class="mock-btn mock-btn-purple">Crear cuenta del jefe</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- PASO 5 -->
+    <div class="step">
+      <span class="step-number">5</span>
+      <h2>Confirmación y Redirección</h2>
+      <p>Si todo es correcto, verás un mensaje de éxito y serás redirigido al login en 2 segundos.</p>
+      <div class="mockup">
+        <div class="mockup-bar">
+          <span class="mockup-dot dot-red"></span>
+          <span class="mockup-dot dot-yellow"></span>
+          <span class="mockup-dot dot-green"></span>
+          <span class="mockup-url">localhost/admin-dashboard/crear-jefe.html</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-card">
+            <h3>👤 Crear cuenta del Jefe</h3>
+            <button class="mock-btn mock-btn-purple" style="opacity:0.6;">Crear cuenta del jefe</button>
+            <div class="mock-success">✅ Cuenta del jefe creada correctamente. Redirigiendo al login...</div>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:16px;"><strong>Lo que sucede internamente:</strong></p>
+      <ol style="margin-top:8px; padding-left:20px; color:#444; font-size:0.9rem; line-height:2;">
+        <li>✓ Se verifica la master key contra el hash en la base de datos</li>
+        <li>✓ Se crea la cuenta en Supabase Auth (email + contraseña)</li>
+        <li>✓ Se inserta el perfil en la tabla <code>usuarios</code> con rol "jefe"</li>
+        <li>✓ Se marca <code>first_run = false</code> (setup completado)</li>
+        <li>✓ Se redirige al login</li>
+      </ol>
+    </div>
+
+    <!-- PASO 6 -->
+    <div class="step">
+      <span class="step-number">6</span>
+      <h2>Iniciar Sesión</h2>
+      <p>Usa el correo y contraseña que acabas de crear para acceder al sistema.</p>
+      <code class="step-url">/admin-dashboard/inicio-de-sesion.html</code>
+      <div class="mockup">
+        <div class="mockup-bar">
+          <span class="mockup-dot dot-red"></span>
+          <span class="mockup-dot dot-yellow"></span>
+          <span class="mockup-dot dot-green"></span>
+          <span class="mockup-url">localhost/admin-dashboard/inicio-de-sesion.html</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-card">
+            <h3 style="text-align:center;">ADDBOX</h3>
+            <p style="text-align:center;">Acceso Personal</p>
+            <span class="mock-label">Correo electrónico</span>
+            <div class="mock-input">carlos@addbox.com</div>
+            <span class="mock-label">Contraseña</span>
+            <div class="mock-input">••••••••••</div>
+            <button class="mock-btn mock-btn-purple">Ingresar</button>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:16px;">Después del login exitoso, serás redirigido al <strong>Dashboard</strong> con acceso completo como rol "jefe".</p>
+    </div>
+    <!-- DIAGRAMA DE FLUJO -->
+    <div class="flow-diagram">
+      <h2>🗺️ Mapa del Flujo Completo</h2>
+      <div class="flow-steps">
+        <div class="flow-item dev">🧑‍💻 Desarrollador accede a<br><strong>/setup/dev-master-key.html</strong></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item system">⚙️ Sistema genera clave aleatoria<br><code>ADDBOX-OWNER-xxxx-xxxx-xxxx-xxxx</code></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item system">💾 Hash SHA-256 guardado en Supabase<br>(tabla <code>instalacion</code>)</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item dev">📥 Desarrollador descarga/copia la clave</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item dev">🤝 Entrega la clave al jefe</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item jefe">👤 Jefe accede a<br><strong>/crear-jefe.html</strong></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item jefe">📝 Llena: nombre, correo, contraseña, master key</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item system">🔐 Sistema verifica hash de la clave</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item system">✅ Crea cuenta en Auth + perfil en DB (rol: jefe)</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item system">🔄 Marca <code>first_run = false</code></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item jefe">🔑 Jefe hace login en<br><strong>/inicio-de-sesion.html</strong></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item jefe" style="border-color:#27ae60; background:#eafaf1;">🎉 <strong>Dashboard</strong> — Acceso total como "jefe"</div>
+      </div>
+    </div>
+    <!-- SOLUCIÓN DE PROBLEMAS -->
+    <div class="step" style="border-left-color: #d63031;">
+      <span class="step-number" style="background:#d63031;">!</span>
+      <h2>Solución de Problemas</h2>
+      <p>Si encuentras algún error durante el proceso, consulta esta tabla:</p>
+      <table class="trouble-table">
+        <thead>
+          <tr><th>Error</th><th>Causa</th><th>Solución</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>"Completa todos los campos"</td>
+            <td>Un campo está vacío</td>
+            <td>Verifica que todos los campos tengan contenido</td>
+          </tr>
+          <tr>
+            <td>"Contraseña muy corta"</td>
+            <td>Menos de 6 caracteres</td>
+            <td>Usa una contraseña de 6+ caracteres</td>
+          </tr>
+          <tr>
+            <td>"Master key incorrecta"</td>
+            <td>La clave no coincide</td>
+            <td>Verifica que copiaste la clave completa sin espacios extra</td>
+          </tr>
+          <tr>
+            <td>"Error al verificar instalación"</td>
+            <td>Supabase no responde</td>
+            <td>Verifica conexión a internet y que Supabase esté activo</td>
+          </tr>
+          <tr>
+            <td>"No se ha generado master key"</td>
+            <td>Paso 1 no completado</td>
+            <td>Ve primero a /setup/dev-master-key.html</td>
+          </tr>
+          <tr>
+            <td>"User already registered"</td>
+            <td>Email ya existe en Auth</td>
+            <td>Usa otro correo o elimina el usuario en Supabase Dashboard</td>
+          </tr>
+          <tr>
+            <td>"Error al guardar perfil"</td>
+            <td>Tabla usuarios con restricciones</td>
+            <td>Verifica que la tabla existe y las políticas RLS permiten insert</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NOTAS DE SEGURIDAD -->
+    <div class="step" style="border-left-color: #f39c12;">
+      <span class="step-number" style="background:#f39c12;">🔒</span>
+      <h2>Notas de Seguridad</h2>
+      <ul style="margin-top:12px; padding-left:20px; color:#444; font-size:0.9rem; line-height:2;">
+        <li>La master key es de <strong>un solo uso</strong>. Una vez creada la cuenta, ya no sirve.</li>
+        <li>El hash SHA-256 es <strong>irreversible</strong>. Nadie puede obtener la clave desde la base de datos.</li>
+        <li>Después del setup, <code>first_run = false</code> impide repetir el proceso.</li>
+        <li>El rol "jefe" tiene <strong>acceso total</strong> al sistema.</li>
+        <li>No compartas la master key por canales inseguros.</li>
+      </ul>
+    </div>
+    <!-- URLS RÁPIDAS -->
+    <div class="step" style="border-left-color: #00b894;">
+      <span class="step-number" style="background:#00b894;">🔗</span>
+      <h2>URLs de Referencia Rápida</h2>
+      <table class="trouble-table">
+        <thead>
+          <tr><th>Paso</th><th>URL</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="color:#333;">Generar Master Key</td><td><code>/admin-dashboard/setup/dev-master-key.html</code></td></tr>
+          <tr><td style="color:#333;">Crear cuenta Jefe</td><td><code>/admin-dashboard/crear-jefe.html</code></td></tr>
+          <tr><td style="color:#333;">Login</td><td><code>/admin-dashboard/inicio-de-sesion.html</code></td></tr>
+          <tr><td style="color:#333;">Dashboard</td><td><code>/admin-dashboard/modules/dashboard/dashboard.html</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="guide-footer">
+      <p>ADDBOX LLC — Guía de configuración inicial</p>
+      <p>Generado: 19 de mayo de 2026 | Versión 1.0</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasa de Cambio - ADDBOX</title>
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/toast.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ═══ Estilos premium para tasa de cambio ═══ */
+    .page-subtitle {
+      color: #9aa0b2;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .card-section {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    }
+
+    .card-section h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e8e8e8;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-section h2 i {
+      color: #a29bfe;
+      font-size: 20px;
+    }
+
+    .info-box-premium {
+      background: rgba(108, 92, 231, 0.08);
+      border: 1px solid rgba(108, 92, 231, 0.2);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 16px;
+    }
+    .info-box-premium p {
+      margin: 0 0 6px 0;
+      font-size: 14px;
+      color: #9aa0b2;
+    }
+    .info-box-premium p:last-child {
+      margin-bottom: 0;
+    }
+    .info-box-premium strong {
+      color: #a29bfe;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e8e8e8;
+      margin-bottom: 8px;
+    }
+
+    .form-input-premium {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      color: #e8e8e8;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    .form-input-premium:focus {
+      outline: none;
+      border-color: #6c5ce7;
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    }
+    .form-input-premium::placeholder {
+      color: #6b7280;
+    }
+
+    .form-hint {
+      display: block;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #9aa0b2;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    /* Botones premium */
+    .btn-premium-primary {
+      background: linear-gradient(135deg, #6c5ce7, #00d2ff);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .btn-premium-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
+    }
+    .btn-premium-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-premium-primary::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.15);
+      transition: 0.4s;
+    }
+    .btn-premium-primary:hover:not(:disabled)::after {
+      left: 0;
+    }
+
+    .btn-premium-secondary {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 24px;
+      border-radius: 10px;
+      color: #9aa0b2;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+    }
+    .btn-premium-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #e8e8e8;
+      transform: translateY(-2px);
+    }
+
+    .btn-retorno {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px 18px;
+      border-radius: 10px;
+      color: #9aa0b2;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-retorno:hover {
+      background: rgba(108, 92, 231, 0.1);
+      border-color: rgba(108, 92, 231, 0.3);
+      color: #e8e8e8;
+      transform: translateY(-2px);
+    }
+
+    /* Tabla premium */
+    .table-premium {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .table-premium th {
+      background: #6c5ce7;
+      color: white;
+      padding: 12px 14px;
+      font-weight: 600;
+      font-size: 13px;
+      text-align: left;
+    }
+    .table-premium td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      color: #dcdcdc;
+      font-size: 13px;
+    }
+    .table-premium tr:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .table-container-premium {
+      overflow-x: auto;
+      border-radius: 14px;
+    }
+
+    /* KPI cards para tasa actual */
+    .tasa-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .tasa-kpi-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .tasa-kpi-label {
+      font-size: 12px;
+      color: #9aa0b2;
+      margin-bottom: 6px;
+    }
+    .tasa-kpi-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #a29bfe;
+    }
+    .tasa-kpi-value.green { color: #22c55e; }
+    .tasa-kpi-value.blue { color: #00d2ff; }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .tasa-kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 24px;">
+
+        <!-- Topbar -->
+        <header class="topbar">
+          <div>
+            <h1>Tasa de Cambio USD → VES</h1>
+            <p class="page-subtitle">Actualiza la tasa de cambio para convertir automáticamente dólares a bolívares</p>
+          </div>
+          <div class="top-actions" style="display:flex;gap:12px;">
+            <button class="btn-retorno" onclick="window.location.href='/admin-dashboard/modules/dashboard/dashboard.html'">
+              <i class="fa fa-arrow-left"></i> Volver al Dashboard
+            </button>
+            <button class="logout-btn" onclick="logout()" style="padding:8px 16px;">
+              <i class="fa fa-right-from-bracket"></i> Salir
+            </button>
+          </div>
+        </header>
+
+        <!-- Configuración Actual -->
+        <section class="card-section">
+          <h2><i class="fa fa-chart-line"></i> Configuración Actual</h2>
+          <div class="tasa-kpi-grid">
+            <div class="tasa-kpi-card">
+              <div class="tasa-kpi-label">Tasa actual</div>
+              <div class="tasa-kpi-value green" id="tasaActual">Cargando...</div>
+            </div>
+            <div class="tasa-kpi-card">
+              <div class="tasa-kpi-label">Fecha</div>
+              <div class="tasa-kpi-value blue" id="fechaTasa">Cargando...</div>
+            </div>
+            <div class="tasa-kpi-card">
+              <div class="tasa-kpi-label">Fuente</div>
+              <div class="tasa-kpi-value" id="fuenteTasa">BCV</div>
+            </div>
+          </div>
+          <p style="font-size:13px;color:#9ca3af;margin-bottom:16px;">
+            Consulta la tasa oficial del BCV y la muestra aquí. <strong style="color:#9aa0b2;">No modifica productos.</strong>
+          </p>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <button id="btnConsultarBCV" class="btn-premium-primary" style="background:linear-gradient(135deg,#6c5ce7,#00d2ff);">
+              <i class="fa fa-eye"></i> Consultar Tasa BCV del Día
+            </button>
+            <span id="consultaBcvStatus" style="font-size:13px;color:#9ca3af;"></span>
+          </div>
+        </section>
+
+        <!-- Obtener Tasa BCV Automática -->
+        <section class="card-section" style="border:1px solid rgba(34,197,94,0.2);">
+          <h2><i class="fa fa-bolt" style="color:#22c55e;"></i> Obtener Tasa BCV Automática</h2>
+          <p style="font-size:13px;color:#9ca3af;margin-bottom:16px;">
+            Consulta la tasa oficial del BCV del día, la guarda y <strong style="color:#22c55e;">recalcula automáticamente el costo en BS de todos los productos del inventario</strong>.
+          </p>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <button id="btnObtenerBCV" class="btn-premium-primary" style="background:linear-gradient(135deg,#22c55e,#00d2ff);">
+              <i class="fa fa-download"></i> Obtener Tasa BCV del Día
+            </button>
+            <span id="bcvStatus" style="font-size:13px;color:#9ca3af;"></span>
+          </div>
+          <div id="bcvResultado" style="display:none;margin-top:14px;padding:14px 18px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;">
+            <p style="margin:0;font-size:14px;color:#22c55e;font-weight:600;">
+              <i class="fa fa-check-circle"></i> <span id="bcvResultMsg"></span>
+            </p>
+          </div>
+        </section>
+
+        <!-- Historial de Tasas -->
+        <section class="card-section">
+          <h2><i class="fa fa-clock-rotate-left"></i> Historial de Tasas</h2>
+          <div class="table-container-premium">
+            <table class="table-premium">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tasa</th>
+                  <th>Fuente</th>
+                  <th>Creado</th>
+                </tr>
+              </thead>
+              <tbody id="historialTasas"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="services/supabase-simple.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    // Consultar tasa BCV — misma lógica que "Obtener Tasa BCV Automática" pero SOLO muestra
+    document.addEventListener("DOMContentLoaded", function() {
+      var btn = document.getElementById("btnConsultarBCV");
+      if (btn) btn.addEventListener("click", consultarTasaBCVSoloMostrar);
+    });
+
+    async function consultarTasaBCVSoloMostrar() {
+      var statusEl = document.getElementById("consultaBcvStatus");
+      var btn = document.getElementById("btnConsultarBCV");
+      statusEl.textContent = "⏳ Consultando tasa BCV...";
+      btn.disabled = true;
+
+      var tasa = null;
+      var fuente = "BCV";
+
+      // API 1: pydolarve
+      try {
+        var res = await fetch("https://pydolarve.org/api/v2/dollar?page=bcv");
+        if (res.ok) {
+          var data = await res.json();
+          if (data && data.monitors && data.monitors.usd && data.monitors.usd.price) {
+            tasa = parseFloat(data.monitors.usd.price);
+            fuente = "BCV (pydolarve)";
+          }
+        }
+      } catch (e) { console.log("pydolarve falló"); }
+
+      // API 2: dolarapi
+      if (!tasa) {
+        try {
+          var res2 = await fetch("https://ve.dolarapi.com/v1/dolares/oficial");
+          if (res2.ok) {
+            var data2 = await res2.json();
+            if (data2 && data2.promedio) {
+              tasa = parseFloat(data2.promedio);
+              fuente = "BCV (dolarapi)";
+            }
+          }
+        } catch (e) { console.log("dolarapi falló"); }
+      }
+
+      if (tasa && tasa > 0) {
+        document.getElementById("tasaActual").textContent = tasa.toFixed(4) + " VES";
+        document.getElementById("fechaTasa").textContent = new Date().toISOString().split("T")[0];
+        document.getElementById("fuenteTasa").textContent = fuente;
+        statusEl.textContent = "✅ Tasa consultada exitosamente";
+      } else {
+        statusEl.textContent = "❌ No se pudo obtener. Usa el botón verde de abajo para guardar y actualizar.";
+      }
+
+      btn.disabled = false;
+    }
+  </script>
+  <script type="module" src="config-tasa-cambio.js"></script>
+</body>
+</html>

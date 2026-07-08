@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Productos - ADDBOX Inventory</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+    .modal-overlay.show { display:flex; }
+    .modal-card { background:#1a1a2e; border-radius:12px; padding:24px; width:90%; max-width:500px; }
+    .modal-card h3 { margin-bottom:16px; }
+    .modal-card label { display:block; font-size:0.8rem; margin-top:10px; color:#9ca3af; }
+    .modal-card input, .modal-card select { width:100%; padding:8px 12px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; margin-top:4px; }
+    .modal-card .modal-actions { display:flex; gap:10px; margin-top:16px; }
+    .modal-card .modal-actions button { padding:8px 16px; border:none; border-radius:6px; cursor:pointer; }
+    .btn-save { background:#6c5ce7; color:#fff; }
+    .btn-cancel { background:#333; color:#fff; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap: 30px;">
+        <header class="topbar">
+          <h1>Inventario</h1>
+          <div class="top-actions">
+            <button class="primary" onclick="abrirFormulario()" style="padding:8px 16px;">+ Nuevo producto</button>
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- KPIs -->
+        <section class="grid-cards">
+          <div class="card" style="padding:18px;">
+            <div>
+              <div class="card-title" style="font-size:13px;">Total productos</div>
+              <div class="card-value" id="kpi-total" style="font-size:26px;">—</div>
+            </div>
+            <i class="fa fa-box" style="font-size:28px;"></i>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div>
+              <div class="card-title" style="font-size:13px;">Valor inventario</div>
+              <div class="card-value" id="kpi-valor" style="font-size:26px;">—</div>
+            </div>
+            <i class="fa fa-dollar-sign" style="font-size:28px;"></i>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div>
+              <div class="card-title" style="font-size:13px;">Stock crítico</div>
+              <div class="card-value" id="kpi-critico" style="font-size:26px;color:#ef4444;">—</div>
+            </div>
+            <i class="fa fa-triangle-exclamation" style="font-size:28px;color:#ef4444;"></i>
+          </div>
+          <div class="card" style="padding:18px;">
+            <div>
+              <div class="card-title" style="font-size:13px;">Productos activos</div>
+              <div class="card-value" id="kpi-activos" style="font-size:26px;color:#22c55e;">—</div>
+            </div>
+            <i class="fa fa-check-circle" style="font-size:28px;color:#22c55e;"></i>
+          </div>
+        </section>
+
+        <!-- Acciones rápidas -->
+        <section class="quick-actions" style="flex-wrap:wrap;">
+          <button class="primary" style="padding:10px 18px;" onclick="abrirFormulario()">📥 Registrar entrada</button>
+          <button class="primary" style="padding:10px 18px;" onclick="abrirFormulario()">📤 Registrar salida</button>
+          <button class="primary" style="padding:10px 18px;" onclick="filtrarCriticos()">🔴 Ver stock crítico</button>
+          <button class="primary" style="padding:10px 18px;" onclick="filtrarProductos()">📋 Ver todos</button>
+        </section>
+
+        <!-- Gráficas -->
+        <section style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div class="chart-box" style="min-height:280px;">
+            <h3 style="font-size:14px;margin-bottom:12px;color:#9ca3af;">Distribución por estado</h3>
+            <div id="chart-estado" style="height:240px;"></div>
+          </div>
+          <div class="chart-box" style="min-height:280px;">
+            <h3 style="font-size:14px;margin-bottom:12px;color:#9ca3af;">Top 10 productos por costo</h3>
+            <div id="chart-top-costo" style="height:240px;"></div>
+          </div>
+        </section>
+
+        <section style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
+          <div class="chart-box" style="min-height:260px;">
+            <h3 style="font-size:14px;margin-bottom:12px;color:#9ca3af;">Niveles de stock (Top 15)</h3>
+            <div id="chart-niveles" style="height:220px;"></div>
+          </div>
+          <div class="chart-box" style="min-height:260px;">
+            <h3 style="font-size:14px;margin-bottom:12px;color:#9ca3af;">Resumen de inventario</h3>
+            <div id="chart-resumen" style="height:220px;"></div>
+          </div>
+        </section>
+
+        <!-- Alertas de stock -->
+        <section id="alertas-stock" style="display:none;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:16px;">
+          <h3 style="font-size:14px;color:#ef4444;margin-bottom:10px;">⚠️ Productos con stock crítico</h3>
+          <div id="lista-criticos" style="font-size:13px;"></div>
+        </section>
+
+        <!-- Gráficas -->
+        <section style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div class="chart-box" style="min-height:260px;">
+            <h3 style="font-size:14px;margin-bottom:12px;">Top 10 productos por valor</h3>
+            <div id="chart-top-valor" style="height:220px;"></div>
+          </div>
+          <div class="chart-box" style="min-height:260px;">
+            <h3 style="font-size:14px;margin-bottom:12px;">Distribución de stock</h3>
+            <div id="chart-stock-dist" style="height:220px;"></div>
+          </div>
+        </section>
+
+        <!-- Búsqueda -->
+        <section style="margin-bottom:16px;">
+          <input type="text" id="searchBar" placeholder="Buscar por codigo o descripcion..." oninput="filtrarProductos()" style="width:100%;padding:10px 14px;border:1px solid #333;border-radius:8px;background:#111;color:#fff;">
+        </section>
+
+        <section class="historial">
+          <table class="dashboard-table">
+            <thead><tr><th>Codigo</th><th>Descripcion</th><th>Costo</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tablaProductos"><tr><td colspan="6">Cargando productos...</td></tr></tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Crear -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <h3>Nuevo Producto</h3>
+      <form id="productoForm" onsubmit="handleFormSubmit(event)">
+        <label>Codigo</label><input type="text" id="codigo" required>
+        <label>Descripcion</label><input type="text" id="descripcion" required>
+        <label>Costo promedio</label><input type="text" id="costo_prom" required>
+        <label>Estado</label>
+        <select id="estado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select>
+        <label>Unidad</label><input type="text" id="unidad">
+        <label>Existencia</label><input type="text" id="existencia">
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">Guardar</button>
+          <button type="button" class="btn-cancel" onclick="cerrarFormulario()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Editar -->
+  <div class="modal-overlay hidden" id="modalEditarProducto">
+    <div class="modal-card">
+      <h3>Editar Producto</h3>
+      <form id="formEditarProducto">
+        <input type="hidden" id="edit_id">
+        <label>Codigo</label><input type="text" id="edit_codigo">
+        <label>Descripcion</label><input type="text" id="edit_descripcion">
+        <label>Unidad</label><input type="text" id="edit_unidad">
+        <label>Costo promedio</label><input type="text" id="edit_costo_prom">
+        <label>Existencia</label><input type="text" id="edit_existencia">
+        <label>Estado</label>
+        <select id="edit_estado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select>
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">Guardar cambios</button>
+          <button type="button" class="btn-cancel" id="btnCerrarEditar">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+
+  <script>
+    let productosData = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(cargarProductos, 50);
+      document.getElementById("btnCerrarEditar").addEventListener("click", cerrarEditarProducto);
+      document.getElementById("formEditarProducto").addEventListener("submit", guardarCambiosProducto);
+    });
+
+    async function cargarProductos() {
+      const db = window.supabaseClient;
+      if (!db) return;
+      const tbody = document.getElementById("tablaProductos");
+      const { data, error } = await db.from("productos").select("*").order("codigo");
+      if (error) { tbody.innerHTML = `<tr><td colspan="6">Error: ${error.message}</td></tr>`; return; }
+      if (!data || data.length === 0) { tbody.innerHTML = `<tr><td colspan="6">No hay productos.</td></tr>`; return; }
+      productosData = data;
+      renderProductos(data);
+      calcularKPIs(data);
+      renderCharts(data);
+      renderGraficas(data);
+    }
+
+    function calcularKPIs(data) {
+      const total = data.length;
+      const activos = data.filter(p => p.estado === "activo").length;
+      const valor = data.reduce((sum, p) => sum + (Number(p.costo_prom) || 0), 0);
+      const criticos = data.filter(p => (p.existencia || 0) < 5 && p.estado === "activo");
+
+      document.getElementById("kpi-total").textContent = total;
+      document.getElementById("kpi-valor").textContent = "$" + valor.toFixed(0);
+      document.getElementById("kpi-critico").textContent = criticos.length;
+      document.getElementById("kpi-activos").textContent = activos;
+
+      // Mostrar alertas si hay productos críticos
+      const alertas = document.getElementById("alertas-stock");
+      const lista = document.getElementById("lista-criticos");
+      if (criticos.length > 0) {
+        alertas.style.display = "block";
+        lista.innerHTML = criticos.slice(0, 5).map(p => 
+          `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+            🔴 <strong>${p.descripcion || p.codigo}</strong> — Stock: ${p.existencia || 0} unidades
+          </div>`
+        ).join("");
+      } else {
+        alertas.style.display = "none";
+      }
+    }
+
+    function filtrarCriticos() {
+      const criticos = productosData.filter(p => (p.existencia || 0) < 5 && p.estado === "activo");
+      renderProductos(criticos);
+      document.getElementById("searchBar").value = "";
+    }
+
+    function renderGraficas(data) {
+      // Gráfica 1: Top 10 por valor (bar horizontal)
+      const top10 = [...data].sort((a, b) => (b.costo_prom || 0) - (a.costo_prom || 0)).slice(0, 10);
+      new ApexCharts(document.querySelector("#chart-top-valor"), {
+        chart: { type: "bar", height: 220, toolbar: { show: false }, background: "transparent" },
+        series: [{ name: "Costo", data: top10.map(p => Number(p.costo_prom) || 0) }],
+        xaxis: { categories: top10.map(p => (p.descripcion || p.codigo || "").substring(0, 15)) },
+        colors: ["#6c5ce7"],
+        plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
+        theme: { mode: "dark" },
+        grid: { borderColor: "rgba(255,255,255,0.05)" }
+      }).render();
+
+      // Gráfica 2: Distribución de stock (donut)
+      const criticos = data.filter(p => (p.existencia || 0) < 5).length;
+      const alerta = data.filter(p => (p.existencia || 0) >= 5 && (p.existencia || 0) < 10).length;
+      const ok = data.filter(p => (p.existencia || 0) >= 10).length;
+      const sinStock = data.filter(p => !p.existencia || p.existencia === 0).length;
+
+      new ApexCharts(document.querySelector("#chart-stock-dist"), {
+        chart: { type: "donut", height: 220, background: "transparent" },
+        series: [ok, alerta, criticos, sinStock],
+        labels: ["OK (≥10)", "Alerta (5-9)", "Crítico (<5)", "Sin stock"],
+        colors: ["#22c55e", "#f97316", "#ef4444", "#6b7280"],
+        theme: { mode: "dark" },
+        legend: { position: "bottom", labels: { colors: "#9ca3af" } }
+      }).render();
+    }
+
+    function renderProductos(data) {
+      const tbody = document.getElementById("tablaProductos");
+      tbody.innerHTML = data.map(p => {
+        const stock = p.existencia || 0;
+        let stockColor = "#22c55e";
+        let stockLabel = "OK";
+        if (stock < 5) { stockColor = "#ef4444"; stockLabel = "BAJO"; }
+        else if (stock < 10) { stockColor = "#f97316"; stockLabel = "ALERTA"; }
+
+        return `
+        <tr>
+          <td>${p.codigo || ""}</td>
+          <td>${p.descripcion || ""}</td>
+          <td>${p.costo_prom != null ? "$" + Number(p.costo_prom).toFixed(2) : ""}</td>
+          <td><span style="color:${stockColor};font-weight:600;">${stock}</span> <span style="font-size:10px;color:${stockColor};">${stockLabel}</span></td>
+          <td><span style="background:${p.estado==='activo'?'rgba(0,210,255,0.15)':'rgba(255,118,117,0.15)'};color:${p.estado==='activo'?'#00d2ff':'#ff7675'};padding:4px 10px;border-radius:6px;font-size:12px;">${p.estado}</span></td>
+          <td><button onclick="editarProducto('${p.id}')" style="background:#6c5ce7;border:none;color:#fff;padding:4px 10px;border-radius:6px;cursor:pointer;"><i class="fa fa-pen"></i></button></td>
+        </tr>`;
+      }).join("");
+    }
+
+    function filtrarProductos() {
+      const q = document.getElementById("searchBar").value.toLowerCase().trim();
+      const filtered = productosData.filter(p =>
+        (p.codigo && p.codigo.toLowerCase().includes(q)) ||
+        (p.descripcion && p.descripcion.toLowerCase().includes(q))
+      );
+      renderProductos(filtered);
+    }
+
+    function abrirFormulario() { document.getElementById("modalOverlay").style.display = "flex"; }
+    function cerrarFormulario() { document.getElementById("modalOverlay").style.display = "none"; document.getElementById("productoForm").reset(); }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const db = window.supabaseClient;
+      if (!db) { alert("Error de conexion"); return; }
+      const producto = {
+        codigo: document.getElementById("codigo").value,
+        descripcion: document.getElementById("descripcion").value,
+        costo_prom: Number(document.getElementById("costo_prom").value.replace(",",".")),
+        estado: document.getElementById("estado").value,
+        unidad: document.getElementById("unidad").value || null,
+        existencia: document.getElementById("existencia").value ? Number(document.getElementById("existencia").value) : null
+      };
+      const { error } = await db.from("productos").insert([producto]);
+      if (error) { alert("Error: " + error.message); return; }
+      alert("Producto creado");
+      await cargarProductos();
+      cerrarFormulario();
+    }
+
+    function editarProducto(id) {
+      const p = productosData.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById("edit_id").value = p.id;
+      document.getElementById("edit_codigo").value = p.codigo || "";
+      document.getElementById("edit_descripcion").value = p.descripcion || "";
+      document.getElementById("edit_unidad").value = p.unidad || "";
+      document.getElementById("edit_costo_prom").value = p.costo_prom || "";
+      document.getElementById("edit_existencia").value = p.existencia || "";
+      document.getElementById("edit_estado").value = p.estado || "activo";
+      document.getElementById("modalEditarProducto").classList.remove("hidden");
+      document.getElementById("modalEditarProducto").style.display = "flex";
+    }
+
+    function cerrarEditarProducto() {
+      document.getElementById("modalEditarProducto").classList.add("hidden");
+      document.getElementById("modalEditarProducto").style.display = "none";
+    }
+
+    async function guardarCambiosProducto(e) {
+      e.preventDefault();
+      const db = window.supabaseClient;
+      if (!db) { alert("Error de conexion"); return; }
+      const id = document.getElementById("edit_id").value;
+      const producto = {
+        codigo: document.getElementById("edit_codigo").value,
+        descripcion: document.getElementById("edit_descripcion").value,
+        unidad: document.getElementById("edit_unidad").value || null,
+        costo_prom: document.getElementById("edit_costo_prom").value ? Number(document.getElementById("edit_costo_prom").value.replace(",",".")) : null,
+        existencia: document.getElementById("edit_existencia").value ? Number(document.getElementById("edit_existencia").value) : null,
+        estado: document.getElementById("edit_estado").value
+      };
+      const { error } = await db.from("productos").update(producto).eq("id", id);
+      if (error) { alert("Error: " + error.message); return; }
+      alert("Producto actualizado");
+      await cargarProductos();
+      cerrarEditarProducto();
+    }
+
+    function logout() { window.location.href = "/portal-autoservicio.html"; }
+    window.editarProducto = editarProducto;
+    window.filtrarCriticos = filtrarCriticos;
+
+    function renderCharts(data) {
+      if (typeof ApexCharts === "undefined") return;
+
+      // Gráfica 1: Distribución por estado (donut)
+      const activos = data.filter(p => p.estado === "activo").length;
+      const inactivos = data.filter(p => p.estado !== "activo").length;
+      new ApexCharts(document.querySelector("#chart-estado"), {
+        chart: { type: "donut", height: 240 },
+        labels: ["Activos", "Inactivos"],
+        series: [activos, inactivos],
+        colors: ["#22c55e", "#ef4444"],
+        legend: { position: "bottom", labels: { colors: "#9ca3af" } }
+      }).render();
+
+      // Gráfica 2: Top 10 por costo (bar horizontal)
+      const top10 = [...data].sort((a, b) => (b.costo_prom || 0) - (a.costo_prom || 0)).slice(0, 10);
+      new ApexCharts(document.querySelector("#chart-top-costo"), {
+        chart: { type: "bar", height: 240, toolbar: { show: false } },
+        series: [{ name: "Costo", data: top10.map(p => Number(p.costo_prom) || 0) }],
+        xaxis: { categories: top10.map(p => (p.descripcion || p.codigo || "").substring(0, 15)) },
+        plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
+        colors: ["#6c5ce7"],
+        grid: { borderColor: "rgba(255,255,255,0.05)" }
+      }).render();
+
+      // Gráfica 3: Niveles de stock (bar vertical)
+      const top15stock = [...data].filter(p => p.existencia != null).sort((a, b) => (a.existencia || 0) - (b.existencia || 0)).slice(0, 15);
+      new ApexCharts(document.querySelector("#chart-niveles"), {
+        chart: { type: "bar", height: 220, toolbar: { show: false } },
+        series: [{ name: "Stock", data: top15stock.map(p => p.existencia || 0) }],
+        xaxis: { categories: top15stock.map(p => (p.descripcion || p.codigo || "").substring(0, 12)), labels: { style: { fontSize: "10px" } } },
+        colors: top15stock.map(p => (p.existencia || 0) < 5 ? "#ef4444" : (p.existencia || 0) < 10 ? "#f97316" : "#22c55e"),
+        plotOptions: { bar: { borderRadius: 3, distributed: true } },
+        legend: { show: false },
+        grid: { borderColor: "rgba(255,255,255,0.05)" }
+      }).render();
+
+      // Gráfica 4: Resumen radial
+      const totalVal = data.reduce((s, p) => s + (Number(p.costo_prom) || 0), 0);
+      const pctActivos = Math.round((activos / data.length) * 100);
+      const pctStock = Math.round((data.filter(p => (p.existencia || 0) >= 5).length / data.length) * 100);
+      new ApexCharts(document.querySelector("#chart-resumen"), {
+        chart: { type: "radialBar", height: 220 },
+        series: [pctActivos, pctStock],
+        labels: ["Activos", "Stock OK"],
+        colors: ["#22c55e", "#3b82f6"],
+        plotOptions: { radialBar: { dataLabels: { name: { color: "#9ca3af" }, value: { color: "#fff" } } } }
+      }).render();
+    }
+  </script>
+</body>
+</html>

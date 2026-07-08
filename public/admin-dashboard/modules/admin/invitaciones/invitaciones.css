@@ -1,0 +1,193 @@
+:root {
+  --addbox-bg: #0c0f16;
+  --addbox-card: #141922;
+  --addbox-border: rgba(255,255,255,0.08);
+  --addbox-text: #e6e6e6;
+  --addbox-muted: #9ca3af;
+  --addbox-blue: #1d4ed8;
+  --addbox-blue-hover: #2563eb;
+  --addbox-blue-light: #3b82f6;
+  --addbox-shadow: 0 4px 18px rgba(0,0,0,0.55);
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--addbox-bg);
+  margin: 0;
+  padding: 30px;
+  color: var(--addbox-text);
+}
+
+.dashboard-center {
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.ms-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--addbox-border);
+}
+
+.ms-header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.ms-header-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.ms-header h1 {
+  font-size: 30px;
+  margin: 0;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.ms-header p {
+  margin: 0;
+  color: var(--addbox-muted);
+}
+
+.ms-card {
+  background: var(--addbox-card);
+  padding: 28px;
+  border-radius: 14px;
+  border: 1px solid var(--addbox-border);
+  box-shadow: var(--addbox-shadow);
+  margin-bottom: 32px;
+}
+
+.ms-quick-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-bottom: 30px;
+}
+
+.ms-qcard {
+  background: var(--addbox-card);
+  padding: 22px;
+  border-radius: 14px;
+  border: 1px solid var(--addbox-border);
+  box-shadow: var(--addbox-shadow);
+  text-align: center;
+  transition: 0.25s;
+}
+
+.ms-qcard:hover {
+  background: #1b2230;
+  transform: translateY(-3px);
+}
+
+.ms-qcard h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--addbox-muted);
+}
+
+.ms-qcard p {
+  font-size: 30px;
+  margin: 12px 0 0;
+  font-weight: bold;
+  color: #fff;
+}
+
+.ms-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.ms-field label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+  color: var(--addbox-muted);
+}
+
+.ms-field input,
+.ms-field select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--addbox-border);
+  border-radius: 8px;
+  background: #0c111b;
+  color: #fff;
+  transition: 0.2s;
+}
+
+.ms-field input:focus,
+.ms-field select:focus {
+  outline: none;
+  border-color: var(--addbox-blue-light);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.35);
+}
+
+.ms-actions {
+  grid-column: span 2;
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ms-btn-primary {
+  background: var(--addbox-blue);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 600;
+}
+
+.ms-btn-primary:hover {
+  background: var(--addbox-blue-hover);
+}
+
+.ms-btn-secondary {
+  background: #1a1f2a;
+  color: var(--addbox-text);
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--addbox-border);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.ms-btn-secondary:hover {
+  background: #232a38;
+}
+
+.ms-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--addbox-text);
+  background: var(--addbox-card);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ms-table th,
+.ms-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--addbox-border);
+}
+
+.ms-table th {
+  text-align: left;
+  color: var(--addbox-muted);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ms-table tr:hover {
+  background: rgba(255,255,255,0.04);
+}

@@ -1,0 +1,21 @@
+{
+  "enabled": true,
+  "name": "Auto-analyze images on edit",
+  "description": "Automatically analyze images when edited in the project",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.gif",
+      "*.svg",
+      "*.webp"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the updated image and explain what changed and how it affects the design or functionality."
+  }
+}

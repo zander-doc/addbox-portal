@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Panel de Control - ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- CSS GLOBAL -->
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Alex Chat Widget -->
+  <link rel="stylesheet" href="../../../src/ai/alex/chat-widget.css">
+
+  <style>
+    /* === DASHBOARD PREMIUM OVERRIDES === */
+
+    /* KPI Grid */
+    .kpi-grid {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:16px;
+      margin-bottom:8px;
+    }
+    .kpi-card-premium {
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:14px;
+      padding:20px;
+      display:flex;
+      align-items:center;
+      gap:16px;
+      transition:all 0.2s ease;
+    }
+    .kpi-card-premium:hover {
+      background:rgba(255,255,255,0.07);
+      transform:translateY(-2px);
+      box-shadow:0 8px 20px rgba(0,0,0,0.3);
+    }
+    .kpi-card-premium .kpi-icon {
+      width:48px;
+      height:48px;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:#fff;
+      flex-shrink:0;
+    }
+    .kpi-card-premium .kpi-info { flex:1; }
+    .kpi-card-premium .kpi-value { font-size:24px; font-weight:800; color:#fff; }
+    .kpi-card-premium .kpi-label { font-size:12px; color:#9ca3af; margin-top:2px; }
+
+    /* Charts Grid */
+    .charts-premium {
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:16px;
+      margin-bottom:8px;
+    }
+    .chart-card {
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:14px;
+      padding:18px;
+      min-height:280px;
+    }
+    .chart-card h3 {
+      font-size:13px;
+      color:#9ca3af;
+      margin:0 0 12px 0;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
+
+    /* Quick Actions */
+    .quick-grid {
+      display:grid;
+      grid-template-columns:repeat(6, 1fr);
+      gap:12px;
+      margin-bottom:8px;
+    }
+    .quick-card {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      padding:18px 10px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px;
+      text-decoration:none;
+      color:#aaa;
+      font-size:11px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .quick-card:hover {
+      background:rgba(255,255,255,0.08);
+      transform:translateY(-3px);
+      box-shadow:0 6px 18px rgba(108,92,231,0.2);
+      color:#fff;
+    }
+    .quick-icon {
+      width:42px;
+      height:42px;
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      color:#fff;
+    }
+
+    /* Alerts Section */
+    .alerts-grid {
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:14px;
+      margin-bottom:8px;
+    }
+    .alert-card {
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px;
+      padding:16px;
+    }
+    .alert-card h4 {
+      font-size:13px;
+      color:#9ca3af;
+      margin:0 0 10px 0;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .alert-card .alert-count {
+      font-size:22px;
+      font-weight:800;
+      color:#fff;
+    }
+    .alert-card .alert-count.danger { color:#ef4444; }
+    .alert-card .alert-count.warning { color:#f59e0b; }
+    .alert-card .alert-count.info { color:#6c5ce7; }
+
+    /* Table Premium */
+    .table-premium {
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+    .table-premium th {
+      padding:12px 14px;
+      text-align:left;
+      font-size:11px;
+      text-transform:uppercase;
+      color:#9ca3af;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      letter-spacing:0.5px;
+    }
+    .table-premium td {
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+      color:#ddd;
+    }
+    .table-premium tr:hover { background:rgba(255,255,255,0.03); }
+    .badge-tipo {
+      display:inline-block;
+      padding:3px 10px;
+      border-radius:6px;
+      font-size:11px;
+      font-weight:600;
+    }
+    .badge-tipo.entrada { background:rgba(34,197,94,0.15); color:#22c55e; }
+    .badge-tipo.salida { background:rgba(239,68,68,0.15); color:#ef4444; }
+
+    /* Section Headers */
+    .section-title {
+      font-size:16px;
+      font-weight:700;
+      color:#fff;
+      margin:0 0 14px 0;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .section-title i { color:#6c5ce7; font-size:14px; }
+
+    /* Responsive */
+    @media (max-width:1024px) {
+      .kpi-grid { grid-template-columns:repeat(2, 1fr); }
+      .charts-premium { grid-template-columns:1fr; }
+      .quick-grid { grid-template-columns:repeat(3, 1fr); }
+      .alerts-grid { grid-template-columns:1fr; }
+      .obras-dashboard-grid { grid-template-columns:repeat(2, 1fr) !important; }
+    }
+    @media (max-width:600px) {
+      .kpi-grid { grid-template-columns:1fr; }
+      .quick-grid { grid-template-columns:repeat(2, 1fr); }
+      .obras-dashboard-grid { grid-template-columns:1fr !important; }
+    }
+
+    /* Obras Dashboard Cards */
+    .obras-dashboard-grid {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+    }
+    .obra-dash-card {
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px;
+      padding:16px;
+      transition:all 0.2s ease;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+    }
+    .obra-dash-card:hover {
+      background:rgba(255,255,255,0.07);
+      transform:translateY(-2px);
+      box-shadow:0 6px 18px rgba(0,0,0,0.25);
+      border-color:rgba(0,206,201,0.3);
+    }
+    .obra-dash-card.activa::before {
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;
+      height:3px;
+      background:linear-gradient(90deg,#00cec9,#55efc4);
+    }
+    .obra-dash-card.inactiva {
+      opacity:0.6;
+    }
+    .obra-dash-card.inactiva::before {
+      content:'';
+      position:absolute;
+      top:0;left:0;right:0;
+      height:3px;
+      background:linear-gradient(90deg,#636e72,#b2bec3);
+    }
+    .obra-dash-name {
+      font-size:14px;
+      font-weight:700;
+      color:#fff;
+      margin-bottom:6px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .obra-dash-meta {
+      font-size:11px;
+      color:#9ca3af;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .obra-dash-meta i {
+      width:14px;
+      text-align:center;
+      color:#6c5ce7;
+    }
+    .obra-dash-stats {
+      display:flex;
+      gap:12px;
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,0.06);
+    }
+    .obra-dash-stat {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+    .obra-dash-stat-value {
+      font-size:16px;
+      font-weight:800;
+      color:#fff;
+    }
+    .obra-dash-stat-label {
+      font-size:10px;
+      color:#9ca3af;
+      text-transform:uppercase;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+
+    <main class="content">
+      <div class="dashboard-center" style="gap:24px;">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <h1><i class="fa fa-gauge" style="color:#6c5ce7;"></i> Panel de Control</h1>
+          <div class="top-actions">
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECCIÓN 1: KPIs PREMIUM                -->
+        <!-- ═══════════════════════════════════════ -->
+        <section>
+          <h2 class="section-title"><i class="fa fa-chart-simple"></i> Indicadores Clave</h2>
+          <div class="kpi-grid">
+            <div class="kpi-card-premium">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);"><i class="fa fa-layer-group"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="stockTotal">—</div>
+                <div class="kpi-label">Stock total disponible</div>
+              </div>
+            </div>
+            <div class="kpi-card-premium">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#00b894,#55efc4);"><i class="fa fa-dollar-sign"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="valorInventario">—</div>
+                <div class="kpi-label">Valor total del inventario</div>
+              </div>
+            </div>
+            <div class="kpi-card-premium">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#00d2ff,#0097e6);"><i class="fa fa-right-left"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="movimientosHoy">—</div>
+                <div class="kpi-label">Movimientos hoy</div>
+              </div>
+            </div>
+            <div class="kpi-card-premium">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#e17055,#d63031);"><i class="fa fa-triangle-exclamation"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="totalProductos">—</div>
+                <div class="kpi-label">Productos en inventario</div>
+              </div>
+            </div>
+            <div class="kpi-card-premium">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);"><i class="fa fa-box-open"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="materialesFuera">—</div>
+                <div class="kpi-label">Materiales fuera</div>
+              </div>
+            </div>
+            <div class="kpi-card-premium">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#fdcb6e,#e17055);"><i class="fa fa-wrench"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="enReparacion">—</div>
+                <div class="kpi-label">En reparación</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECCIÓN 2: GRÁFICAS                    -->
+        <!-- ═══════════════════════════════════════ -->
+        <section>
+          <h2 class="section-title"><i class="fa fa-chart-area"></i> Analítica</h2>
+          <div class="charts-premium">
+            <div class="chart-card">
+              <h3>Movimientos últimos 7 días</h3>
+              <div id="chartMovimientosSemana" style="height:240px;"></div>
+            </div>
+            <div class="chart-card">
+              <h3>Entradas vs Salidas</h3>
+              <div id="chartEntradasSalidas" style="height:240px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECCIÓN 3: ACCESOS RÁPIDOS             -->
+        <!-- ═══════════════════════════════════════ -->
+        <section>
+          <h2 class="section-title"><i class="fa fa-bolt"></i> Accesos Rápidos</h2>
+          <div class="quick-grid">
+            <a href="../productos/productos.html" class="quick-card">
+              <div class="quick-icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);"><i class="fa fa-box"></i></div>
+              <span>Productos</span>
+            </a>
+            <a href="../movimientos/movimientos.html" class="quick-card">
+              <div class="quick-icon" style="background:linear-gradient(135deg,#00d2ff,#0097e6);"><i class="fa fa-right-left"></i></div>
+              <span>Movimientos</span>
+            </a>
+            <a href="../documentos/documentos_inventario.html" class="quick-card">
+              <div class="quick-icon" style="background:linear-gradient(135deg,#fdcb6e,#e17055);"><i class="fa fa-file-contract"></i></div>
+              <span>Documentos</span>
+            </a>
+            <a href="../devoluciones/registrar_devolucion.html" class="quick-card">
+              <div class="quick-icon" style="background:linear-gradient(135deg,#00b894,#55efc4);"><i class="fa fa-rotate-left"></i></div>
+              <span>Devoluciones</span>
+            </a>
+            <a href="../reportes/devoluciones.html" class="quick-card">
+              <div class="quick-icon" style="background:linear-gradient(135deg,#e17055,#d63031);"><i class="fa fa-clipboard-list"></i></div>
+              <span>Reportes</span>
+            </a>
+            <a href="../inventario/inventario.html" class="quick-card">
+              <div class="quick-icon" style="background:linear-gradient(135deg,#74b9ff,#0984e3);"><i class="fa fa-warehouse"></i></div>
+              <span>Stock por Obra</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECCIÓN 4: PANORAMA DE OBRAS           -->
+        <!-- ═══════════════════════════════════════ -->
+        <section>
+          <h2 class="section-title"><i class="fa fa-building"></i> Panorama de Obras</h2>
+          
+          <!-- KPIs de obras -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+            <div class="kpi-card-premium" style="padding:16px;">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#00cec9,#55efc4);width:40px;height:40px;font-size:16px;"><i class="fa fa-hard-hat"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="obrasActivas" style="font-size:20px;">—</div>
+                <div class="kpi-label">Obras activas</div>
+              </div>
+            </div>
+            <div class="kpi-card-premium" style="padding:16px;">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#636e72,#b2bec3);width:40px;height:40px;font-size:16px;"><i class="fa fa-pause-circle"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="obrasInactivas" style="font-size:20px;">—</div>
+                <div class="kpi-label">Obras inactivas</div>
+              </div>
+            </div>
+            <div class="kpi-card-premium" style="padding:16px;">
+              <div class="kpi-icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe);width:40px;height:40px;font-size:16px;"><i class="fa fa-boxes-stacked"></i></div>
+              <div class="kpi-info">
+                <div class="kpi-value" id="totalStockObras" style="font-size:20px;">—</div>
+                <div class="kpi-label">Items distribuidos</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid de obras activas -->
+          <div style="margin-bottom:12px;">
+            <h3 style="font-size:13px;color:#00cec9;margin:0 0 10px 0;text-transform:uppercase;letter-spacing:0.5px;"><i class="fa fa-circle" style="font-size:8px;"></i> En ejecución</h3>
+            <div id="obrasActivasGrid" class="obras-dashboard-grid">
+              <div style="color:#9ca3af;font-size:13px;padding:12px;">Cargando obras...</div>
+            </div>
+          </div>
+
+          <!-- Grid de obras inactivas (colapsable) -->
+          <div>
+            <h3 style="font-size:13px;color:#636e72;margin:0 0 10px 0;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;" onclick="toggleObrasInactivas()">
+              <i class="fa fa-circle" style="font-size:8px;"></i> Inactivas 
+              <i class="fa fa-chevron-down" id="chevronInactivas" style="font-size:10px;margin-left:6px;transition:transform 0.2s;"></i>
+            </h3>
+            <div id="obrasInactivasGrid" class="obras-dashboard-grid" style="display:none;">
+              <div style="color:#9ca3af;font-size:13px;padding:12px;">Sin obras inactivas</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECCIÓN 5: ALERTAS INTELIGENTES        -->
+        <!-- ═══════════════════════════════════════ -->
+        <section>
+          <h2 class="section-title"><i class="fa fa-bell"></i> Alertas</h2>
+          <div class="alerts-grid">
+            <div class="alert-card">
+              <h4><i class="fa fa-triangle-exclamation" style="color:#ef4444;"></i> Stock Crítico</h4>
+              <div class="alert-count danger" id="stockCriticoCount">0</div>
+              <div id="panelStockCritico" style="margin-top:8px;font-size:12px;color:#9ca3af;">Cargando...</div>
+            </div>
+            <div class="alert-card">
+              <h4><i class="fa fa-wrench" style="color:#f59e0b;"></i> Reparaciones pendientes (&gt;7 días)</h4>
+              <div class="alert-count warning" id="reparacionesLargas">0</div>
+              <div style="margin-top:8px;font-size:12px;color:#9ca3af;">Herramientas con más de 7 días en reparación</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!-- SECCIÓN 6: MOVIMIENTOS RECIENTES       -->
+        <!-- ═══════════════════════════════════════ -->
+        <section>
+          <h2 class="section-title"><i class="fa fa-clock-rotate-left"></i> Movimientos Recientes</h2>
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;">
+            <table class="table-premium">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Tipo</th>
+                  <th>Cantidad</th>
+                  <th>Obra</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="movimientosTableBody">
+                <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:20px;">Cargando movimientos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- SUPABASE v1 (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-client.js"></script>
+
+  <!-- Auth & Guards -->
+  <script type="module">
+    import { requireSession } from "../../services/auth-guard.js";
+    import { checkInstallation } from "../../services/install-guard.js";
+    import { requireRole } from "../../services/role-guard.js";
+
+    await requireSession();
+    const isInstalled = await checkInstallation();
+    if (!isInstalled) {
+      window.location.href = "/admin-dashboard/setup/dev-master-key.html";
+    }
+    await requireRole(["jefe", "admin", "rrhh", "almacenista", "invitado"]);
+  </script>
+
+  <!-- ApexCharts -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+  <!-- Sidebar -->
+  <script src="../../assets/js/sidebar.js"></script>
+
+  <!-- Dashboard Logic -->
+  <script src="../../dashboard-simple.js"></script>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- ALEX DE ADDBOX — Chat Widget           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div id="alexPanel" class="alex-panel">
+    <div class="alex-header">
+      <div class="alex-header-avatar">
+        <img src="/admin-dashboard/assets/img/ALEX-IA.png" alt="Alex IA" />
+        <span class="alex-status-dot"></span>
+      </div>
+      <div class="alex-header-info">
+        <div class="alex-name">Alex IA</div>
+        <div class="alex-subtitle">Copiloto de Inventario</div>
+      </div>
+      <button id="alexClose">×</button>
+    </div>
+    <!-- Atajos rápidos -->
+    <div class="alex-shortcuts">
+      <button class="alex-shortcut" data-msg="resumen inventario">📊 Resumen</button>
+      <button class="alex-shortcut" data-msg="productos críticos">⚠️ Críticos</button>
+      <button class="alex-shortcut" data-msg="qué puedo hacer">🧭 Ayuda</button>
+      <button class="alex-shortcut" data-msg="pasos transferencia">📋 Transferencia</button>
+    </div>
+    <div id="alexMessages" class="alex-messages"></div>
+    <div class="alex-input-area">
+      <input id="alexInput" type="text" placeholder="Pregunta a Alex IA..." autocomplete="off" />
+      <button id="alexSend">Enviar</button>
+    </div>
+  </div>
+  <button id="alexButton" class="alex-button" aria-label="Abrir Alex IA"></button>
+
+  <!-- Alex: detectar usuario y cargar widget -->
+  <script>
+    // Intentar obtener rol real del usuario logueado
+    (function() {
+      try {
+        const raw = localStorage.getItem("supabase.auth.token");
+        if (raw) {
+          const session = JSON.parse(raw);
+          const user = session?.currentSession?.user;
+          if (user) {
+            window.userId = user.id;
+            window.userRole = user.user_metadata?.role || "admin";
+            window.userName = user.user_metadata?.nombre || user.email;
+          }
+        }
+      } catch(e) {}
+      // Fallback
+      if (!window.userId) window.userId = "admin-dashboard-user";
+      if (!window.userRole) window.userRole = "admin";
+    })();
+  </script>
+  <script src="../../../src/ai/alex/chat-widget.js"></script>
+
+  <!-- KPIs de Devoluciones -->
+  <script type="module">
+    import { obtenerResumenDevoluciones } from "../devoluciones/devoluciones.service.js";
+    import { obtenerEnReparacion } from "../devoluciones/reportes-cierre.service.js";
+
+    async function cargarKPIsDevoluciones() {
+      try {
+        const resumen = await obtenerResumenDevoluciones(7);
+        const elFuera = document.getElementById("materialesFuera");
+        if (elFuera) elFuera.textContent = resumen.totalFuera || 0;
+      } catch (e) {
+        const elFuera = document.getElementById("materialesFuera");
+        if (elFuera) elFuera.textContent = "0";
+      }
+
+      try {
+        const reparacion = await obtenerEnReparacion();
+        const elRep = document.getElementById("enReparacion");
+        if (elRep) elRep.textContent = reparacion.length || 0;
+
+        // Reparaciones > 7 días
+        const hoy = new Date();
+        const largas = reparacion.filter(r => {
+          if (!r.creado_en) return false;
+          const dias = Math.floor((hoy - new Date(r.creado_en)) / (1000*60*60*24));
+          return dias > 7;
+        });
+        const elLargas = document.getElementById("reparacionesLargas");
+        if (elLargas) elLargas.textContent = largas.length;
+      } catch (e) {
+        const elRep = document.getElementById("enReparacion");
+        if (elRep) elRep.textContent = "0";
+      }
+    }
+
+    // Ejecutar después de que el DOM esté listo
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", cargarKPIsDevoluciones);
+    } else {
+      cargarKPIsDevoluciones();
+    }
+  </script>
+
+  <!-- Panorama de Obras -->
+  <script>
+    async function cargarPanoramaObras() {
+      const db = window.supabaseClient;
+      if (!db) return;
+
+      try {
+        // Cargar todas las obras
+        const { data: obras, error } = await db
+          .from("obras")
+          .select("id, nombre, direccion, descripcion, estado")
+          .order("nombre");
+
+        if (error || !obras) return;
+
+        const activas = obras.filter(o => o.estado === "activa");
+        const inactivas = obras.filter(o => o.estado !== "activa");
+
+        // KPIs
+        document.getElementById("obrasActivas").textContent = activas.length;
+        document.getElementById("obrasInactivas").textContent = inactivas.length;
+
+        // Cargar stock por obra para estadísticas
+        const { data: stockData } = await db
+          .from("stock_obra")
+          .select("obra_id, cantidad");
+
+        const stockPorObra = {};
+        let totalItems = 0;
+        (stockData || []).forEach(s => {
+          if (!stockPorObra[s.obra_id]) stockPorObra[s.obra_id] = { items: 0, stock: 0 };
+          stockPorObra[s.obra_id].items++;
+          stockPorObra[s.obra_id].stock += (s.cantidad || 0);
+          totalItems += (s.cantidad || 0);
+        });
+
+        document.getElementById("totalStockObras").textContent = totalItems.toLocaleString();
+
+        // Cargar movimientos recientes por obra (últimos 7 días)
+        const hace7 = new Date();
+        hace7.setDate(hace7.getDate() - 7);
+        const { data: movData } = await db
+          .from("movimientos")
+          .select("obra_id")
+          .gte("creado_en", hace7.toISOString());
+
+        const movPorObra = {};
+        (movData || []).forEach(m => {
+          if (m.obra_id) {
+            movPorObra[m.obra_id] = (movPorObra[m.obra_id] || 0) + 1;
+          }
+        });
+
+        // Render obras activas
+        const gridActivas = document.getElementById("obrasActivasGrid");
+        if (activas.length === 0) {
+          gridActivas.innerHTML = `<div style="color:#9ca3af;font-size:13px;padding:12px;">No hay obras activas</div>`;
+        } else {
+          gridActivas.innerHTML = activas.map(obra => renderObraCard(obra, stockPorObra, movPorObra, "activa")).join("");
+        }
+
+        // Render obras inactivas
+        const gridInactivas = document.getElementById("obrasInactivasGrid");
+        if (inactivas.length === 0) {
+          gridInactivas.innerHTML = `<div style="color:#9ca3af;font-size:13px;padding:12px;">No hay obras inactivas</div>`;
+        } else {
+          gridInactivas.innerHTML = inactivas.map(obra => renderObraCard(obra, stockPorObra, movPorObra, "inactiva")).join("");
+        }
+
+      } catch (err) {
+        console.error("Error cargando panorama de obras:", err);
+      }
+    }
+
+    function renderObraCard(obra, stockPorObra, movPorObra, clase) {
+      const stats = stockPorObra[obra.id] || { items: 0, stock: 0 };
+      const movs = movPorObra[obra.id] || 0;
+
+      return `
+        <div class="obra-dash-card ${clase}" onclick="window.location.href='/admin-dashboard/modules/inventario/inventario.html?obra=${obra.id}'">
+          <div class="obra-dash-name" title="${escHtml(obra.nombre)}">${escHtml(obra.nombre)}</div>
+          <div class="obra-dash-meta">
+            ${obra.direccion ? `<span><i class="fa fa-map-pin"></i> ${escHtml(obra.direccion)}</span>` : ""}
+            ${obra.descripcion ? `<span><i class="fa fa-info-circle"></i> ${escHtml(obra.descripcion)}</span>` : ""}
+          </div>
+          <div class="obra-dash-stats">
+            <div class="obra-dash-stat">
+              <span class="obra-dash-stat-value">${stats.items}</span>
+              <span class="obra-dash-stat-label">Productos</span>
+            </div>
+            <div class="obra-dash-stat">
+              <span class="obra-dash-stat-value">${stats.stock}</span>
+              <span class="obra-dash-stat-label">Stock</span>
+            </div>
+            <div class="obra-dash-stat">
+              <span class="obra-dash-stat-value">${movs}</span>
+              <span class="obra-dash-stat-label">Mov. 7d</span>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function escHtml(str) {
+      if (!str) return "";
+      const d = document.createElement("div");
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function toggleObrasInactivas() {
+      const grid = document.getElementById("obrasInactivasGrid");
+      const chevron = document.getElementById("chevronInactivas");
+      if (grid.style.display === "none") {
+        grid.style.display = "grid";
+        chevron.style.transform = "rotate(180deg)";
+      } else {
+        grid.style.display = "none";
+        chevron.style.transform = "rotate(0deg)";
+      }
+    }
+
+    // Cargar después de un breve delay para que supabaseClient esté listo
+    setTimeout(cargarPanoramaObras, 200);
+  </script>
+</body>
+</html>

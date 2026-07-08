@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Reportes - Motivo de Cierre - ADDBOX</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="icon" type="image/png" href="/admin-dashboard/assets/img/logo-addbox-icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .kpi-section { display:flex; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+    .kpi-card { background:rgba(255,255,255,0.04); border:1px solid #2d2d44; border-radius:10px; padding:16px 20px; flex:1; min-width:200px; }
+    .kpi-card .valor { font-size:28px; font-weight:bold; }
+    .kpi-card .label { font-size:12px; color:#9ca3af; margin-top:4px; }
+    .kpi-card.peligro .valor { color:#ef4444; }
+    .kpi-card.alerta .valor { color:#f59e0b; }
+    .kpi-card.info .valor { color:#6c5ce7; }
+
+    .report-section { margin-bottom:32px; }
+    .report-section h2 { font-size:16px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    .report-section h2 i { color:#6c5ce7; }
+
+    .filtros-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:8px; border:1px solid #2d2d44; margin-bottom:12px; }
+    .filtros-row select, .filtros-row input { padding:6px 10px; border:1px solid #333; border-radius:6px; background:#111; color:#fff; font-size:13px; }
+    .filtros-row select { min-width:160px; }
+    .filtros-row input[type="date"] { width:140px; }
+
+    .report-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .report-table th, .report-table td { padding:10px 12px; border-bottom:1px solid #2d2d44; text-align:left; }
+    .report-table th { color:#9ca3af; font-size:11px; text-transform:uppercase; }
+
+    .btn-csv { background:#2d2d44; color:#9ca3af; border:1px solid #444; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:12px; margin-top:10px; transition:0.15s; }
+    .btn-csv:hover { background:#6c5ce7; color:#fff; border-color:#6c5ce7; }
+    .btn-csv i { margin-right:4px; }
+
+    .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  </style>
+</head>
+<body>
+  <div class="main-layout">
+    <div id="sidebar-container"></div>
+    <main class="content">
+      <div class="dashboard-center" style="gap:24px;">
+        <header class="topbar">
+          <h1><i class="fa fa-chart-bar"></i> Reportes — Motivo de Cierre</h1>
+          <div class="top-actions">
+            <button class="logout-btn" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Salir</button>
+          </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <section class="kpi-section">
+          <div class="kpi-card peligro">
+            <div class="valor" id="kpi-total-extraviados">0</div>
+            <div class="label"><i class="fa fa-triangle-exclamation"></i> Total Extraviados</div>
+          </div>
+          <div class="kpi-card alerta">
+            <div class="valor" id="kpi-total-reparacion">0</div>
+            <div class="label"><i class="fa fa-wrench"></i> En Reparación</div>
+          </div>
+          <div class="kpi-card info">
+            <div class="valor" id="kpi-costo-perdidas">$0.00</div>
+            <div class="label"><i class="fa fa-dollar-sign"></i> Costo Total de Pérdidas</div>
+          </div>
+        </section>
+
+        <!-- Sección: Herramientas Extraviadas -->
+        <section class="report-section" id="seccion-extraviados">
+          <h2><i class="fa fa-triangle-exclamation"></i> Herramientas Extraviadas</h2>
+          <div class="filtros-row">
+            <select id="filtro-proyecto-extraviados">
+              <option value="">Todos los proyectos</option>
+            </select>
+            <input type="date" id="filtro-fecha-desde-ext" title="Fecha desde">
+            <input type="date" id="filtro-fecha-hasta-ext" title="Fecha hasta">
+          </div>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th style="text-align:center;">Cantidad</th>
+                <th>Proyecto/Obra</th>
+                <th>Fecha</th>
+                <th style="text-align:right;">Costo Unitario</th>
+                <th style="text-align:right;">Costo Total</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-extraviados-body">
+              <tr><td colspan="7" style="text-align:center;color:#9ca3af;">Cargando...</td></tr>
+            </tbody>
+          </table>
+          <button class="btn-csv" id="btn-csv-extraviados"><i class="fa fa-download"></i> Exportar CSV</button>
+        </section>
+
+        <!-- Sección: Herramientas en Reparación -->
+        <section class="report-section" id="seccion-reparacion">
+          <h2><i class="fa fa-wrench"></i> Herramientas en Reparación</h2>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th style="text-align:center;">Cantidad</th>
+                <th>Proyecto/Obra</th>
+                <th>Fecha de Registro</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-reparacion-body">
+              <tr><td colspan="6" style="text-align:center;color:#9ca3af;">Cargando...</td></tr>
+            </tbody>
+          </table>
+          <button class="btn-csv" id="btn-csv-reparacion"><i class="fa fa-download"></i> Exportar CSV</button>
+        </section>
+
+        <!-- Sección: Consumibles por Proyecto -->
+        <section class="report-section" id="seccion-consumibles">
+          <h2><i class="fa fa-fire"></i> Consumibles por Proyecto</h2>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Proyecto</th>
+                <th style="text-align:center;">Total Items</th>
+                <th style="text-align:right;">Costo Total</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-consumibles-body">
+              <tr><td colspan="3" style="text-align:center;color:#9ca3af;">Cargando...</td></tr>
+            </tbody>
+          </table>
+          <button class="btn-csv" id="btn-csv-consumibles"><i class="fa fa-download"></i> Exportar CSV</button>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
+  <script src="../../services/supabase-simple.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script type="module" src="./reportes-cierre.controller.js"></script>
+  <script>function logout(){window.location.href="../../inicio-de-sesion.html";}</script>
+</body>
+</html>

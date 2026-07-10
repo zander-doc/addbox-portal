@@ -6,25 +6,51 @@
 
 /**
  * Configuración centralizada de variables de entorno
- * En producción (Cloudflare Pages), usar Environment Variables
- * En desarrollo, usar localStorage o window globals
+ * 
+ * ═══════════════════════════════════════════════════════════════
+ * CONFIGURACIÓN EN PRODUCCIÓN (Cloudflare Pages):
+ * ═══════════════════════════════════════════════════════════════
+ * 
+ * 1. Ve a Cloudflare Pages → Settings → Environment Variables
+ * 2. Agrega las siguientes variables:
+ *    - NEON_DATABASE_URL: URL de conexión a Neon PostgreSQL
+ *    - CLERK_PUBLISHABLE_KEY: Key pública de Clerk (pk_test_...)
+ *    - CLERK_SECRET_KEY: Key secreta de Clerk (solo server-side)
+ *    - APP_URL: URL de la aplicación (opcional)
+ * 
+ * ═══════════════════════════════════════════════════════════════
+ * CONFIGURACIÓN EN DESARROLLO:
+ * ═══════════════════════════════════════════════════════════════
+ * 
+ * Opción 1: localStorage (recomendado para desarrollo)
+ *   - Abre DevTools → Console
+ *   - Ejecuta: saveConfigToStorage({ NEON_DATABASE_URL: '...', CLERK_PUBLISHABLE_KEY: '...' })
+ * 
+ * Opción 2: Window globals
+ *   - En la consola: window.NEON_DATABASE_URL = '...'
+ *   - En la consola: window.CLERK_PUBLISHABLE_KEY = '...'
+ * 
+ * ═══════════════════════════════════════════════════════════════
  */
 export const config = {
   // Neon Database URL
+  // Obtén tu URL en: https://neon.tech → Dashboard → Connection Details
   neonUrl:
     (typeof process !== 'undefined' && process.env?.NEON_DATABASE_URL) ||
     window.NEON_DATABASE_URL ||
     localStorage.getItem('NEON_DATABASE_URL') ||
-    'postgresql://neondb_owner:npg_e6ydNLUP4xni@ep-floral-credit-ath8csmy-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
+    '',
 
   // Clerk Publishable Key (pública, segura para frontend)
+  // Obtén tu key en: https://clerk.com → Dashboard → API Keys
   clerkPubKey:
     (typeof process !== 'undefined' && process.env?.CLERK_PUBLISHABLE_KEY) ||
     window.CLERK_PUBLISHABLE_KEY ||
     localStorage.getItem('CLERK_PUBLISHABLE_KEY') ||
-    'pk_test_bWVldC1kdWNrbGluZy0zNC5jbGVyay5hY2NvdW50cy5kZXYk',
+    '',
 
   // Clerk Secret Key (NUNCA exponer en frontend - solo para server-side)
+  // Esta key solo debe usarse en Cloudflare Workers o server-side
   clerkSecretKey:
     (typeof process !== 'undefined' && process.env?.CLERK_SECRET_KEY) ||
     window.CLERK_SECRET_KEY ||
@@ -49,6 +75,31 @@ export const config = {
 };
 
 export default config;
+
+// ===============================================
+//   VALIDACIÓN DE CONFIGURACIÓN
+// ===============================================
+
+// Validar configuración al cargar el módulo
+if (typeof window !== 'undefined') {
+  if (!config.neonUrl) {
+    console.error('❌ NEON_DATABASE_URL no configurada.');
+    console.warn('💡 Configúrala en Cloudflare Pages → Settings → Environment Variables');
+    console.warn('   O en desarrollo: saveConfigToStorage({ NEON_DATABASE_URL: "postgresql://..." })');
+  }
+
+  if (!config.clerkPubKey) {
+    console.error('❌ CLERK_PUBLISHABLE_KEY no configurada.');
+    console.warn('💡 Configúrala en Cloudflare Pages → Settings → Environment Variables');
+    console.warn('   O en desarrollo: saveConfigToStorage({ CLERK_PUBLISHABLE_KEY: "pk_test_..." })');
+  }
+
+  if (config.neonUrl && config.clerkPubKey) {
+    console.log('✅ Configuración cargada correctamente');
+    console.log('   - Neon Database: Configurada');
+    console.log('   - Clerk Auth: Configurada');
+  }
+}
 
 // ===============================================
 //   HELPER: Cargar configuración desde localStorage

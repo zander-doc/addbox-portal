@@ -1,6 +1,6 @@
 /* ============================================================
    DASHBOARD — ADDBOX
-   Requiere: window.supabaseClient (creado por supabase-simple.js)
+   Requiere: window.db (creado por neon-client.js)
 ============================================================ */
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -8,15 +8,15 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 async function initDashboard() {
-    const db = window.supabaseClient;
+    const db = window.db;
 
     if (!db || typeof db.from !== "function") {
-        console.error("❌ window.supabaseClient no disponible.");
+        console.error("❌ window.db no disponible.");
         setNotification("Error: no se pudo conectar con la base de datos.", "error");
         return;
     }
 
-    console.log("✅ Supabase client listo. Cargando dashboard...");
+    console.log("✅ Neon client listo. Cargando dashboard...");
     setNotification("Cargando datos...", "info");
 
     await Promise.allSettled([
@@ -37,7 +37,7 @@ async function cargarIndicadores(db) {
         // Productos totales
         const { count: totalProductos, error: e1 } = await db
             .from("productos")
-            .select("*", { count: "exact", head: true });
+            .select("*", { count: "exact" });
         setEl("totalProductos", e1 ? "—" : totalProductos);
 
         // Stock total
@@ -62,7 +62,7 @@ async function cargarIndicadores(db) {
         // Usuarios — tabla existe pero RLS puede bloquear; mostramos lo que devuelva
         const { count: totalUsuarios, error: e4 } = await db
             .from("usuarios")
-            .select("*", { count: "exact", head: true });
+            .select("*", { count: "exact" });
         if (e4) {
             console.warn("Tabla usuarios:", e4.message);
             setEl("totalUsuarios", "—");

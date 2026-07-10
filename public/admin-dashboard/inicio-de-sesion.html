@@ -35,32 +35,12 @@
         <h2>Bienvenido de nuevo</h2>
         <p class="subtitle">Ingresa tus credenciales</p>
 
-        <form id="loginForm">
-          <div class="input-group">
-            <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
-          </div>
-
-          <div class="input-group password-group">
-            <input type="password" id="loginPassword" placeholder="Contraseña" required>
-            <span class="toggle-password" data-target="loginPassword">👁️</span>
-          </div>
-
-          <div class="forgot-password">
-            <a href="#" id="forgotPasswordLink" class="forgot-link">¿Olvidaste tu contraseña?</a>
-          </div>
-
-          <button type="submit" class="btn-primary">Ingresar</button>
-        </form>
-
-        <p id="loginError" class="error"></p>
-        <div id="login-message" class="login-message"></div>
+        <!-- Clerk Sign In Component -->
+        <div id="clerk-sign-in"></div>
 
         <div class="login-links">
           <a href="/portal-autoservicio.html" class="back-link">← Volver al portal</a>
         </div>
-
-        <!-- Clerk Sign In Component -->
-        <div id="clerk-sign-in"></div>
       </div>
 
     </div> <!-- auth-card -->
@@ -69,13 +49,8 @@
 
   <!-- Neon + Clerk Auth -->
   <script type="module">
-    import { initClerk, getCurrentUser as getClerkUser, isAuthenticated as isClerkAuthenticated } from "./services/auth-clerk.js";
+    import { initClerk } from "./services/auth-clerk.js";
     import { configureNeon } from "./services/neon-client.js";
-    import { login, register, getUserById, updateLastLogin, insertUsuario } from "./modules/login/login.service.js";
-    import { saveSession } from "./services/sessionService.js";
-    import { logAudit } from "./services/auditService.js";
-    import { handleError } from "./services/error-handler.js";
-    import { showToast } from "./services/toastService.js";
 
     // =============================================
     // CONFIGURACIÓN INICIAL
@@ -107,126 +82,9 @@
     });
 
     // =============================================
-    // LOGIN FORM
+    // FORGOT PASSWORD (manejado por Clerk)
     // =============================================
-    const loginForm = document.getElementById("loginForm");
-    if (loginForm) {
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const errorEl = document.getElementById("loginError");
-        errorEl.textContent = "";
-
-        const email = document.getElementById("loginEmail").value;
-        const password = document.getElementById("loginPassword").value;
-        const btn = loginForm.querySelector("button");
-        
-        if (btn) {
-          btn.dataset.originalText = btn.textContent;
-          btn.disabled = true;
-          btn.textContent = "Ingresando...";
-        }
-
-        try {
-          const { data, error } = await login(email, password);
-
-          if (error) {
-            errorEl.textContent = "Error: " + error.message;
-            showToast("Credenciales incorrectas", "error");
-            if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText; }
-            return;
-          }
-
-          if (!data || !data.user) {
-            errorEl.textContent = "Error: no se pudo obtener el usuario.";
-            if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText; }
-            return;
-          }
-
-          // Obtener perfil
-          const perfil = await getUserById(data.user.id);
-          const clerkUser = getClerkUser();
-          const rol = perfil?.rol || clerkUser?.rol || "usuario";
-          const nombre = perfil?.nombre || clerkUser?.nombre || email.split('@')[0];
-
-          // Guardar sesión
-          sessionStorage.setItem("rol", rol);
-          sessionStorage.setItem("nombre", nombre);
-          sessionStorage.setItem("email", email);
-          sessionStorage.setItem("id", data.user.id);
-
-          saveSession({ id: data.user.id, email, rol });
-
-          await updateLastLogin(data.user.id);
-          await logAudit("Auth", "Login", `Usuario ${email} inició sesión`);
-
-          errorEl.textContent = "";
-          const msgEl = document.getElementById("login-message");
-          if (msgEl) {
-            msgEl.textContent = "✅ Acceso concedido. Redirigiendo...";
-            msgEl.className = "login-message success";
-          }
-          showToast("Bienvenido", "success");
-
-          window.location.href = "/admin-dashboard/modules/dashboard/dashboard.html";
-        } catch (err) {
-          console.error("Error en login:", err);
-          errorEl.textContent = "Error inesperado: " + err.message;
-        } finally {
-          if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText; }
-        }
-      });
-    }
-
-    // =============================================
-    // FORGOT PASSWORD
-    // =============================================
-    const forgotLink = document.getElementById("forgotPasswordLink");
-    if (forgotLink) {
-      forgotLink.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("loginEmail").value;
-        if (!email) {
-          handleError("login", new Error("Por favor ingresa tu correo para recuperar la contraseña."));
-          return;
-        }
-        
-        if (window.Clerk) {
-          try {
-            await window.Clerk.client.signIn.create({
-              strategy: "reset_password_email",
-              identifier: email
-            });
-            showToast("Se ha enviado un enlace de recuperación a tu correo", "success");
-          } catch (error) {
-            handleError("login", error);
-          }
-        } else {
-          handleError("login", new Error("Clerk no está disponible para recuperación de contraseña."));
-        }
-      });
-    }
-
-    // =============================================
-    // TOGGLE PASSWORD
-    // =============================================
-    document.querySelectorAll(".toggle-password").forEach((icon) => {
-      icon.addEventListener("click", () => {
-        const target = document.getElementById(icon.dataset.target);
-        if (!target) return;
-        target.type = target.type === "password" ? "text" : "password";
-      });
-    });
-
-    // =============================================
-    // CLERK SIGN IN BUTTON
-    // =============================================
-    const clerkBtn = document.getElementById("clerkSignInBtn");
-    if (clerkBtn && window.Clerk) {
-      clerkBtn.style.display = "block";
-      clerkBtn.addEventListener("click", () => {
-        window.Clerk.openSignIn();
-      });
-    }
+    // El componente de Clerk incluye la opción de recuperación de contraseña
 
     // =============================================
     // CHECK INSTALLATION STATUS
